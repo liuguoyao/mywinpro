@@ -10,6 +10,7 @@ class app
      int run();
      control_base* addChild(control_base& control);
      void Invalidate();
+     std::vector<control_base*> controlsAtPoint(const point &p);
 private:
   static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   BOOL WINAPI TranslateMessage( _In_ CONST MSG* lpMsg);
@@ -28,4 +29,3 @@ private:
   HWND hWnd;
   static std::vector<control_base> childrens;
 };
-

@@ -11,9 +11,10 @@ int main(int argc,char ** argv) {
   c1->setposition(10, 10);
 
   control_base c_2;
+  c_2.resize(80, 80);
+  c_2.setposition(10, 10);
   auto c2 = c1->addChild(c_2);
-  c2->resize(80, 80);
-  c2->setposition(10, 10);
+
 
   control_base c_3;
   auto c3 = c2->addChild(c_3);

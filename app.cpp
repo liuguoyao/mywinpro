@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include<vector>
 
 std::vector<control_base> app::childrens{};
 app::app()
@@ -54,13 +55,37 @@ int app::run()
 
 control_base* app::addChild(control_base& control)
 {
-  childrens.push_back(std::move(control));
+  childrens.push_back(control);
   return &childrens.back();
 }
 
 void app::Invalidate()
 {
   InvalidateRect(hWnd, NULL, TRUE);
+}
+
+std::vector<control_base*> app::controlsAtPoint(const point& p)
+{
+  std::vector<control_base*> children_contrains_point;
+  for (auto &c:childrens)
+  {
+    auto childrens_contain = c.controlsAtPoint(p);
+
+    for (size_t i = 0; i < childrens_contain.size(); i++)
+    {
+      std::wostringstream o;
+      o << childrens_contain[i] << " " << childrens_contain[i]->position().x << "\n";
+      OutputDebugString(o.str().c_str());
+    }
+    //for (auto &c2 : childrens_contain)
+    //{
+    //  //children_contrains_point.push_back(c2);
+    //  std::wostringstream o;
+    //  o << c2 << " " <<c2->position().x<< "\n";
+    //  OutputDebugString(o.str().c_str());
+    //}
+  }
+  return children_contrains_point;
 }
 
 LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -94,7 +119,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
 
     //draw children
-    for (auto c:childrens)
+    for (auto &c:childrens)
     {
       c.paint(hdc);
     }
@@ -119,7 +144,18 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
 {
   std::wostringstream o;
   o << "TranslateMessage" << lpMsg->message << "\n";
-  OutputDebugString(o.str().c_str());
+  //OutputDebugString(o.str().c_str());
+  if (WM_LBUTTONDOWN == lpMsg->message) {
+    POINT pt= lpMsg->pt;
+    ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
+    
+    o.clear();
+    o << lpMsg->pt.x << " " <<lpMsg->pt.y << " | " << pt.x << " " << pt.y << "\n";
+    OutputDebugString(o.str().c_str());
+    point p(pt.x, pt.y);
+    auto r = controlsAtPoint(p);
+    return true;
+  }
   return ::TranslateMessage( lpMsg);
 }
 
