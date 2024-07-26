@@ -71,19 +71,10 @@ std::vector<control_base*> app::controlsAtPoint(const point& p)
   {
     auto childrens_contain = c.controlsAtPoint(p);
 
-    for (size_t i = 0; i < childrens_contain.size(); i++)
+    for (auto &c2 : childrens_contain)
     {
-      std::wostringstream o;
-      o << childrens_contain[i] << " " << childrens_contain[i]->position().x << "\n";
-      OutputDebugString(o.str().c_str());
+      children_contrains_point.push_back(c2);
     }
-    //for (auto &c2 : childrens_contain)
-    //{
-    //  //children_contrains_point.push_back(c2);
-    //  std::wostringstream o;
-    //  o << c2 << " " <<c2->position().x<< "\n";
-    //  OutputDebugString(o.str().c_str());
-    //}
   }
   return children_contrains_point;
 }
@@ -154,6 +145,14 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
     OutputDebugString(o.str().c_str());
     point p(pt.x, pt.y);
     auto r = controlsAtPoint(p);
+    if(r.size()>0) r[r.size() - 1]->setBkColor(rgb(0,0,255));
+    Invalidate();
+    o.clear();
+    for (auto &c:r)
+    {
+      o << c << " " << c->position().x << "\n";
+    }
+    OutputDebugString(o.str().c_str());
     return true;
   }
   return ::TranslateMessage( lpMsg);

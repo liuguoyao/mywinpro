@@ -21,6 +21,7 @@ public:
   control_base* addChild(control_base &control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
+  void setBkColor(const rgb &rgb );
 private:
   int x_relative_parent;
   int y_relative_parent;
@@ -28,6 +29,7 @@ private:
   int height;
   std::vector<control_base> childrens;
   control_base* parent;
+  rgb bkrgb;
 };
 
 #endif

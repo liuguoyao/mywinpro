@@ -69,7 +69,24 @@ void control_base::paint(HDC hdc)
   point relativep = globalposition();
   p1 += relativep;
   p2 += relativep;
-  Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
+  //Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
+
+  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+  HBRUSH hBrush = CreateSolidBrush(RGB(bkrgb.r,bkrgb.g,bkrgb.b));
+  HGDIOBJ oldPen = SelectObject(hdc, hPen);
+  HGDIOBJ oldBrush = SelectObject(hdc, hBrush);
+
+  // 绘制矩形，这里假设是填充的矩形  
+  Rectangle(hdc, p1.x, p1.y, p2.x, p2.y);
+
+  // 恢复旧的画笔和笔刷  
+  SelectObject(hdc, oldPen);
+  SelectObject(hdc, oldBrush);
+
+  // 删除创建的笔刷和画笔  
+  DeleteObject(hPen);
+  DeleteObject(hBrush);
+
   for (auto &c:childrens )
   {
     c.paint(hdc);
@@ -144,4 +161,9 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   }
 
   return ret;
+}
+
+void control_base::setBkColor(const rgb& rgb)
+{
+  bkrgb = rgb;
 }

@@ -26,3 +26,47 @@ point& point::operator+=(point a)
   y += a.y;
   return *this;
 }
+
+rgb::rgb():r(255), g(255), b(255)
+{
+
+}
+
+rgb::rgb(int r, int g, int b)
+{
+  r = r;
+  g = g;
+  b = b;
+}
+
+rgb::rgb(const rgb& other)
+{
+  r = other.r;
+  g = other.g;
+  b = other.b;
+}
+
+rgb::rgb(rgb&& other)
+{
+  r = other.r;
+  g = other.g;
+  b = other.b;
+}
+
+rgb& rgb::operator=(const rgb& other)
+{
+  r = other.r;
+  g = other.g;
+  b = other.b;
+  // TODO: 在此处插入 return 语句
+  return *this;
+}
+
+rgb& rgb::operator=(rgb&& other)
+{
+  r = other.r;
+  g = other.g;
+  b = other.b;
+  // TODO: 在此处插入 return 语句
+  return *this;
+}
