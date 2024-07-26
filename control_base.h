@@ -8,8 +8,8 @@ class control_base
 {
 public:
   control_base() ;
-  control_base(control_base & ctrl_base) ;
-  control_base(control_base && ctrl_base) ;
+  control_base(const control_base & ctrl_base) ;
+  control_base(const control_base && ctrl_base) ;
   control_base& operator=(control_base& ctrl_base);
   control_base& operator=(control_base&& ctrl_base);
   ~control_base();

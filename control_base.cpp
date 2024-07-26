@@ -11,7 +11,7 @@ control_base::control_base() :
 {
 }
 
-control_base::control_base(control_base& ctrl_base) 
+control_base::control_base(const control_base& ctrl_base)
 {
   this->childrens = ctrl_base.childrens;
   this->parent = ctrl_base.parent;
@@ -19,10 +19,9 @@ control_base::control_base(control_base& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
-  OutputDebugString(L"call copy construct\n");
 }
 
-control_base::control_base(control_base&& ctrl_base) 
+control_base::control_base(const control_base&& ctrl_base)
 {
   this->childrens = ctrl_base.childrens;
   this->parent = ctrl_base.parent;
@@ -30,7 +29,6 @@ control_base::control_base(control_base&& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
-  OutputDebugString(L"call move construct\n");
 }
 
 control_base& control_base::operator=(control_base& ctrl_base)
@@ -42,7 +40,6 @@ control_base& control_base::operator=(control_base& ctrl_base)
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
   
-  OutputDebugString(L"call move assignment\n");
   // TODO: 在此处插入 return 语句
   return *this;
 }
@@ -55,7 +52,6 @@ control_base& control_base::operator=(control_base&& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
-  OutputDebugString(L"call move assignment\n");
   // TODO: 在此处插入 return 语句
   return *this;
 }
@@ -137,9 +133,6 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   if (containsPoint(p))
   {
     ret.push_back(this);
-    std::wostringstream o;
-    o << "push " <<this << " " << this->x_relative_parent << " p:" << this->parent << "\n";
-    OutputDebugString(o.str().c_str());
   }
   for (auto &c:childrens)
   {
@@ -149,15 +142,6 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
       ret.push_back(c2);
     }
   }
-
-  std::wostringstream o;
-  o << this << "  ret------------------begin---" << "\n";
-  for (auto c:ret)
-  {
-    o << "ret " << c << " " << c->x_relative_parent << " p:" << c->parent << "\n";
-  }
-  o << this << "  ret------------------end---" << "\n";
-  OutputDebugString(o.str().c_str());
 
   return ret;
 }
