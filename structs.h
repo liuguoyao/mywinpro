@@ -5,6 +5,11 @@ class point
 public:
   point();
   point(int x,int y);
+  point(const point& other);
+  point( point&& other);
+  point& operator=(const point& other);
+  point& operator=( point&& other);
+
   int x;
   int y;
   point operator + (point &a);

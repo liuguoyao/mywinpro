@@ -7,7 +7,8 @@ control_base::control_base() :
   y_relative_parent(0),
   height(0),
   with(0),
-  parent(nullptr)
+  parent(nullptr),
+  hover(false)
 {
 }
 
@@ -19,6 +20,7 @@ control_base::control_base(const control_base& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
+  this->hover = ctrl_base.hover;
 }
 
 control_base::control_base(const control_base&& ctrl_base)
@@ -29,6 +31,7 @@ control_base::control_base(const control_base&& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
+  this->hover = ctrl_base.hover;
 }
 
 control_base& control_base::operator=(control_base& ctrl_base)
@@ -39,6 +42,7 @@ control_base& control_base::operator=(control_base& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
+  this->hover = ctrl_base.hover;
   
   // TODO: 在此处插入 return 语句
   return *this;
@@ -52,6 +56,7 @@ control_base& control_base::operator=(control_base&& ctrl_base)
   this->y_relative_parent = ctrl_base.y_relative_parent;
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
+  this->hover = ctrl_base.hover;
   // TODO: 在此处插入 return 语句
   return *this;
 }
@@ -72,7 +77,12 @@ void control_base::paint(HDC hdc)
   //Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
 
   HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
-  HBRUSH hBrush = CreateSolidBrush(RGB(bkrgb.r,bkrgb.g,bkrgb.b));
+  rgb color;
+  if (hover)
+  {
+    color = bkrgb;
+  }
+  HBRUSH hBrush = CreateSolidBrush(RGB(color.r, color.g, color.b));
   HGDIOBJ oldPen = SelectObject(hdc, hPen);
   HGDIOBJ oldBrush = SelectObject(hdc, hBrush);
 
@@ -163,7 +173,54 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   return ret;
 }
 
+void control_base::updateState(const point& global_p)
+{
+  OutputDebugString(L"updateState\n");
+  if (containsPoint(global_p))
+  {
+    if (!hover)
+    {
+      onEnter();
+      hover = true;
+    }
+  }
+  else
+  {
+    if (hover)
+    {
+      onLeave();
+      hover = false;
+    }
+  }
+  for (auto& c2 : childrens)
+  {
+    c2.updateState(global_p);
+  }
+}
+
+
+
 void control_base::setBkColor(const rgb& rgb)
 {
   bkrgb = rgb;
+}
+
+void control_base::onEnter()
+{
+  OutputDebugString(L"onEnter\n");
+}
+
+void control_base::onLeave()
+{
+  OutputDebugString(L"onLeave\n");
+}
+
+void control_base::onClick()
+{
+  OutputDebugString(L"onClick\n");
+}
+
+void control_base::onDoubleClick()
+{
+  OutputDebugString(L"onDoubleClick\n");
 }

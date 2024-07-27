@@ -10,6 +10,34 @@ point::point(int x, int y):x(x),y(y)
 {
 }
 
+point::point(const point& other)
+{
+  x = other.x;
+  y = other.y;
+}
+
+point::point(point&& other)
+{
+  x = other.x;
+  y = other.y;
+}
+
+point& point::operator=(const point& other)
+{
+  // TODO: 在此处插入 return 语句
+  x = other.x;
+  y = other.y;
+  return *this;
+}
+
+point& point::operator=(point&& other)
+{
+  // TODO: 在此处插入 return 语句
+  x = other.x;
+  y = other.y;
+  return *this;
+}
+
 point point::operator+(point &a)
 {
   return point(a.x+x,a.y+y);
@@ -34,9 +62,9 @@ rgb::rgb():r(255), g(255), b(255)
 
 rgb::rgb(int r, int g, int b)
 {
-  r = r;
-  g = g;
-  b = b;
+  this->r = r;
+  this->g = g;
+  this->b = b;
 }
 
 rgb::rgb(const rgb& other)

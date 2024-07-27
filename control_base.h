@@ -14,6 +14,7 @@ public:
   control_base& operator=(control_base&& ctrl_base);
   ~control_base();
   void paint(HDC hdc);
+
   void resize(int w,int h);
   void setposition(int x, int y);
   point position();
@@ -21,7 +22,16 @@ public:
   control_base* addChild(control_base &control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
+  void updateState(const point &p);
+
   void setBkColor(const rgb &rgb );
+
+  //mouse event
+  void onEnter();
+  void onLeave();
+  void onClick();
+  void onDoubleClick();
+
 private:
   int x_relative_parent;
   int y_relative_parent;
@@ -30,6 +40,7 @@ private:
   std::vector<control_base> childrens;
   control_base* parent;
   rgb bkrgb;
+  bool hover;
 };
 
 #endif

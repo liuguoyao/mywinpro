@@ -135,26 +135,30 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
 {
   std::wostringstream o;
   o << "TranslateMessage" << lpMsg->message << "\n";
-  //OutputDebugString(o.str().c_str());
-  if (WM_LBUTTONDOWN == lpMsg->message) {
-    POINT pt= lpMsg->pt;
+
+  std::vector<control_base*> r;
+  switch (lpMsg->message)
+  {
+  case WM_LBUTTONDOWN:
+  case WM_MOUSEMOVE:
+    POINT pt = lpMsg->pt;
     ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
-    
-    o.clear();
-    o << lpMsg->pt.x << " " <<lpMsg->pt.y << " | " << pt.x << " " << pt.y << "\n";
-    OutputDebugString(o.str().c_str());
-    point p(pt.x, pt.y);
-    auto r = controlsAtPoint(p);
-    if(r.size()>0) r[r.size() - 1]->setBkColor(rgb(0,0,255));
-    Invalidate();
-    o.clear();
-    for (auto &c:r)
+    r = controlsAtPoint(point(pt.x, pt.y));
+    if (r.size() > 0) r[r.size() - 1]->setBkColor(rgb(0, 0, 255));
+
+    for (auto &c:childrens)
     {
-      o << c << " " << c->position().x << "\n";
+      c.updateState(point(pt.x, pt.y));
     }
-    OutputDebugString(o.str().c_str());
+    Invalidate();
     return true;
+    //break;
+
+  default:
+    break;
   }
+
+
   return ::TranslateMessage( lpMsg);
 }
 
