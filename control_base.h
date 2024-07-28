@@ -3,11 +3,14 @@
 #include "framework.h"
 #include <vector>
 #include "structs.h"
+#include <functional>
+#include <string>
 
 class control_base
 {
 public:
   control_base() ;
+  control_base(std::wstring name) ;
   control_base(const control_base & ctrl_base) ;
   control_base(const control_base && ctrl_base) ;
   control_base& operator=(control_base& ctrl_base);
@@ -27,20 +30,36 @@ public:
   void setBkColor(const rgb &rgb );
 
   //mouse event
-  void onEnter();
-  void onLeave();
-  void onClick();
-  void onDoubleClick();
+  std::function<void()> onEnter;
+  std::function<void()> onLeave;
+  std::function<void()> onClick;
+  std::function<void()> onDoubleClick;
+
+  //draw
+  void onPaint(HDC hdc);
+
+public:
+  std::wstring name;
+  int id;
+  std::vector<control_base> childrens;
 
 private:
   int x_relative_parent;
   int y_relative_parent;
   int with;
   int height;
-  std::vector<control_base> childrens;
+  
   control_base* parent;
   rgb bkrgb;
   bool hover;
+
+  //box model
+  int margin;
+  int borderWidth;
+  int padding;
+
+  
+
 };
 
 #endif

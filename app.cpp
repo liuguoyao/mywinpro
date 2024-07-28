@@ -6,10 +6,13 @@
 #include <string>
 #include <sstream>
 #include<vector>
+#include <stack>
+#include <assert.h>  
 
 std::vector<control_base> app::childrens{};
 app::app()
 {
+
   WNDCLASSEXW wcex;
   wcex.cbSize = sizeof(WNDCLASSEX);
   wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -140,23 +143,22 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
   switch (lpMsg->message)
   {
   case WM_LBUTTONDOWN:
-  case WM_MOUSEMOVE:
+  //case WM_MOUSEMOVE:
     POINT pt = lpMsg->pt;
     ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
-    r = controlsAtPoint(point(pt.x, pt.y));
-    if (r.size() > 0) r[r.size() - 1]->setBkColor(rgb(0, 0, 255));
-
+    //r = controlsAtPoint(point(pt.x, pt.y));
     for (auto &c:childrens)
     {
       c.updateState(point(pt.x, pt.y));
     }
-    Invalidate();
+    
     return true;
     //break;
 
   default:
     break;
   }
+  Invalidate();
 
 
   return ::TranslateMessage( lpMsg);
@@ -175,4 +177,31 @@ LRESULT __stdcall app::DispatchMessage(const MSG* lpMsg)
   std::wostringstream o;
   o << "DispatchMessage" << lpMsg->message << "\n";
   return ::DispatchMessage(lpMsg);
+}
+
+control_base* app::findControlByName(const std::wstring& name)
+{
+  std::stack<control_base*> stack;
+  for (auto& c : childrens)
+  {
+    stack.push(&c);
+  }
+
+  while (!stack.empty())
+  {
+    control_base* cur = stack.top();
+    stack.pop();
+    if (name != cur->name) {
+      for (control_base& c1 : cur->childrens)
+      {
+        stack.push( &c1);
+      }
+    }
+    else
+    {
+      return cur;
+    }
+  }
+  MessageBox(NULL, (L"has no control name "+name).c_str(), L"错误", MB_ICONERROR);
+  return nullptr;
 }

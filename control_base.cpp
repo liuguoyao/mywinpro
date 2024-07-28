@@ -8,7 +8,29 @@ control_base::control_base() :
   height(0),
   with(0),
   parent(nullptr),
-  hover(false)
+  hover(false),
+    onClick([]() {}),
+    onDoubleClick([]() {}),
+    onEnter([]() {}),
+    onLeave([]() {}),
+  name(L""),
+  id(0)
+{
+}
+
+control_base::control_base(std::wstring name) :
+  x_relative_parent(0),
+  y_relative_parent(0),
+  height(0),
+  with(0),
+  parent(nullptr),
+  hover(false),
+  onClick([]() {}),
+  onDoubleClick([]() {}),
+  onEnter([]() {}),
+  onLeave([]() {}),
+  name(name),
+  id(0)
 {
 }
 
@@ -21,6 +43,12 @@ control_base::control_base(const control_base& ctrl_base)
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
   this->hover = ctrl_base.hover;
+  this->onClick = ctrl_base.onClick;
+  this->onDoubleClick = ctrl_base.onDoubleClick;
+  this->onEnter = ctrl_base.onEnter;
+  this->onLeave = ctrl_base.onLeave;
+  this->name = ctrl_base.name;
+  this->id = ctrl_base.id;
 }
 
 control_base::control_base(const control_base&& ctrl_base)
@@ -32,6 +60,12 @@ control_base::control_base(const control_base&& ctrl_base)
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
   this->hover = ctrl_base.hover;
+  this->onClick = ctrl_base.onClick;
+  this->onDoubleClick = ctrl_base.onDoubleClick;
+  this->onEnter = ctrl_base.onEnter;
+  this->onLeave = ctrl_base.onLeave;
+  this->name = ctrl_base.name;
+  this->id = ctrl_base.id;
 }
 
 control_base& control_base::operator=(control_base& ctrl_base)
@@ -43,6 +77,12 @@ control_base& control_base::operator=(control_base& ctrl_base)
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
   this->hover = ctrl_base.hover;
+  this->onClick = ctrl_base.onClick;
+  this->onDoubleClick = ctrl_base.onDoubleClick;
+  this->onEnter = ctrl_base.onEnter;
+  this->onLeave = ctrl_base.onLeave;
+  this->name = ctrl_base.name;
+  this->id = ctrl_base.id;
   
   // TODO: 在此处插入 return 语句
   return *this;
@@ -57,6 +97,12 @@ control_base& control_base::operator=(control_base&& ctrl_base)
   this->with = ctrl_base.with;
   this->height = ctrl_base.height;
   this->hover = ctrl_base.hover;
+  this->onClick = ctrl_base.onLeave;
+  this->onDoubleClick = ctrl_base.onLeave;
+  this->onEnter = ctrl_base.onLeave;
+  this->onLeave = ctrl_base.onLeave;
+  this->name = ctrl_base.name;
+  this->id = ctrl_base.id;
   // TODO: 在此处插入 return 语句
   return *this;
 }
@@ -69,38 +115,12 @@ control_base::~control_base()
 
 void control_base::paint(HDC hdc)
 {
-  point p1(x_relative_parent, y_relative_parent);
-  point p2(with + x_relative_parent, height + y_relative_parent);
-  point relativep = globalposition();
-  p1 += relativep;
-  p2 += relativep;
-  //Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
-
-  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
-  rgb color;
-  if (hover)
-  {
-    color = bkrgb;
-  }
-  HBRUSH hBrush = CreateSolidBrush(RGB(color.r, color.g, color.b));
-  HGDIOBJ oldPen = SelectObject(hdc, hPen);
-  HGDIOBJ oldBrush = SelectObject(hdc, hBrush);
-
-  // 绘制矩形，这里假设是填充的矩形  
-  Rectangle(hdc, p1.x, p1.y, p2.x, p2.y);
-
-  // 恢复旧的画笔和笔刷  
-  SelectObject(hdc, oldPen);
-  SelectObject(hdc, oldBrush);
-
-  // 删除创建的笔刷和画笔  
-  DeleteObject(hPen);
-  DeleteObject(hBrush);
-
+  onPaint(hdc);
   for (auto &c:childrens )
   {
     c.paint(hdc);
   }
+
 }
 
 void control_base::resize(int w, int h)
@@ -175,21 +195,20 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
 
 void control_base::updateState(const point& global_p)
 {
-  OutputDebugString(L"updateState\n");
   if (containsPoint(global_p))
   {
     if (!hover)
     {
-      onEnter();
       hover = true;
+      onEnter();
     }
   }
   else
   {
     if (hover)
     {
-      onLeave();
       hover = false;
+      onLeave();
     }
   }
   for (auto& c2 : childrens)
@@ -205,22 +224,29 @@ void control_base::setBkColor(const rgb& rgb)
   bkrgb = rgb;
 }
 
-void control_base::onEnter()
+void control_base::onPaint(HDC hdc)
 {
-  OutputDebugString(L"onEnter\n");
-}
+  point p1(x_relative_parent, y_relative_parent);
+  point p2(with + x_relative_parent, height + y_relative_parent);
+  point relativep = globalposition();
+  p1 += relativep;
+  p2 += relativep;
+  //Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
 
-void control_base::onLeave()
-{
-  OutputDebugString(L"onLeave\n");
-}
+  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+  rgb color;
+  HBRUSH hBrush = CreateSolidBrush(RGB(bkrgb.r, bkrgb.g, bkrgb.b));
+  HGDIOBJ oldPen = SelectObject(hdc, hPen);
+  HGDIOBJ oldBrush = SelectObject(hdc, hBrush);
 
-void control_base::onClick()
-{
-  OutputDebugString(L"onClick\n");
-}
+  // 绘制矩形，这里假设是填充的矩形  
+  Rectangle(hdc, p1.x, p1.y, p2.x, p2.y);
+  // 恢复旧的画笔和笔刷  
+  SelectObject(hdc, oldPen);
+  SelectObject(hdc, oldBrush);
 
-void control_base::onDoubleClick()
-{
-  OutputDebugString(L"onDoubleClick\n");
+  // 删除创建的笔刷和画笔  
+  DeleteObject(hPen);
+  DeleteObject(hBrush);
+
 }
