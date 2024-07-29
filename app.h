@@ -3,6 +3,7 @@
 #include "control_base.h"
 #include <vector>
 #include <string>
+#include <set>
 
 class app
 {
@@ -13,6 +14,7 @@ class app
      void Invalidate();
      std::vector<control_base*> controlsAtPoint(const point &p);
      control_base* findControlByName(const std::wstring& name);
+
 private:
   static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   BOOL WINAPI TranslateMessage( _In_ CONST MSG* lpMsg);
@@ -31,5 +33,5 @@ private:
 private:
   HACCEL hAccelTable;
   HWND hWnd;
-  static std::vector<control_base> childrens;
+  static std::set<control_base> childrens;
 };

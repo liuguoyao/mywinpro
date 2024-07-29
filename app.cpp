@@ -9,7 +9,7 @@
 #include <stack>
 #include <assert.h>  
 
-std::vector<control_base> app::childrens{};
+std::set<control_base> app::childrens{};
 app::app()
 {
 
@@ -58,8 +58,17 @@ int app::run()
 
 control_base* app::addChild(control_base& control)
 {
-  childrens.push_back(control);
-  return &childrens.back();
+  //childrens.push_back(control);
+  //return &childrens.back();
+  std::pair<std::set<control_base>::iterator,bool> pair = childrens.emplace(control);
+  if (pair.second)
+  {
+    return (control_base *)& * pair.first;
+  }
+  else {
+    MessageBox(hWnd,L"has same name of control",L"", MB_OK);
+  }
+  return nullptr;
 }
 
 void app::Invalidate()
@@ -70,9 +79,9 @@ void app::Invalidate()
 std::vector<control_base*> app::controlsAtPoint(const point& p)
 {
   std::vector<control_base*> children_contrains_point;
-  for (auto &c:childrens)
+  for (const auto& c:childrens)
   {
-    auto childrens_contain = c.controlsAtPoint(p);
+    auto childrens_contain = ((control_base&)c).controlsAtPoint(p);
 
     for (auto &c2 : childrens_contain)
     {
@@ -123,10 +132,10 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #endif
 
     //draw children
-    for (auto &c:childrens)
+    for (const auto& c:childrens)
     {
 #ifdef use_double_buffering
-      c.paint(hdcMem);
+      ((control_base&)c).paint(hdcMem);
 #else
       c.paint(hdc);
 #endif
@@ -167,9 +176,9 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
     POINT pt = lpMsg->pt;
     ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
     //r = controlsAtPoint(point(pt.x, pt.y));
-    for (auto &c:childrens)
+    for (const auto& c:childrens)
     {
-      c.updateState(point(pt.x, pt.y));
+      ((control_base&)c).updateState(point(pt.x, pt.y));
     }
     
     return true;
@@ -202,9 +211,9 @@ LRESULT __stdcall app::DispatchMessage(const MSG* lpMsg)
 control_base* app::findControlByName(const std::wstring& name)
 {
   std::stack<control_base*> stack;
-  for (auto& c : childrens)
+  for (const auto& c : childrens)
   {
-    stack.push(&c);
+    stack.push((control_base*) & c);
   }
 
   while (!stack.empty())
@@ -212,9 +221,9 @@ control_base* app::findControlByName(const std::wstring& name)
     control_base* cur = stack.top();
     stack.pop();
     if (name != cur->name) {
-      for (control_base& c1 : cur->childrens)
+      for (const auto& c1 : cur->childrens)
       {
-        stack.push( &c1);
+        stack.push((control_base* ) & c1);
       }
     }
     else

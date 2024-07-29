@@ -39,10 +39,12 @@ public:
   //draw
   void onPaint(HDC hdc);
 
+  bool operator<(const control_base  &other) const;
+
 public:
   std::wstring name;
   int id;
-  std::vector<control_base> childrens;
+  std::set<control_base> childrens;
 
 private:
   int x_relative_parent;

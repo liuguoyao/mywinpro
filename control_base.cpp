@@ -116,7 +116,7 @@ control_base::~control_base()
 void control_base::paint(HDC hdc)
 {
   onPaint(hdc);
-  for (auto &c:childrens )
+  for (auto c:childrens )
   {
     c.paint(hdc);
   }
@@ -154,10 +154,19 @@ point control_base::globalposition()
 
 control_base* control_base::addChild(control_base& control)
 {
-  childrens.push_back(control);
-  auto& c = childrens.back();
-  c.parent = this;
-  return &childrens.back();
+  //childrens.push_back(control);
+  //auto& c = childrens.back();
+  //c.parent = this;
+  //return &childrens.back();
+  std::pair<std::set<control_base>::iterator, bool> pair = childrens.emplace(control);
+  if (pair.second)
+  {
+    return (control_base*) & *pair.first;
+  }
+  else {
+    MessageBox(NULL, L"has same name of control", L"", MB_OK);
+  }
+  return nullptr;
 }
 
 bool control_base::containsPoint(const point& p)
@@ -183,7 +192,7 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   }
   for (auto &c:childrens)
   {
-    auto child_ret = c.controlsAtPoint(p);
+    auto child_ret = ((control_base&)c).controlsAtPoint(p);
     for (auto c2:child_ret)
     {
       ret.push_back(c2);
@@ -211,9 +220,9 @@ void control_base::updateState(const point& global_p)
       onLeave();
     }
   }
-  for (auto& c2 : childrens)
+  for (const auto& c2 : childrens)
   {
-    c2.updateState(global_p);
+    ((control_base&)c2).updateState(global_p);
   }
 }
 
@@ -249,4 +258,9 @@ void control_base::onPaint(HDC hdc)
   DeleteObject(hPen);
   DeleteObject(hBrush);
 
+}
+
+bool control_base::operator<(const control_base &other) const
+{
+  return this->name<other.name;
 }

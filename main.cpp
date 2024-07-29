@@ -11,12 +11,10 @@ int main(int argc,char ** argv) {
   c1->resize(60, 30);
   c1->setposition(10, 10);
   c1->onEnter = [&]()->void {
-    auto c1 = a.findControlByName(L"c");
     c1->setBkColor(rgb(0, 220, 0));
     };
   c1->onLeave = [&]()->void {
-    auto c1f = a.findControlByName(L"c");
-    c1f->setBkColor(rgb(220, 220, 220));
+    c1->setBkColor(rgb(220, 220, 220));
     };
 
   control_base c_2(L"c2");
@@ -29,8 +27,7 @@ int main(int argc,char ** argv) {
   c2->setposition(50, 10);
 
   c2->onLeave = [&]()->void {
-    auto c2f = a.findControlByName(L"c2");
-    c2f->setBkColor(rgb(220, 220, 220));
+    c2->setBkColor(rgb(220, 220, 220));
     };
 
   control_base c_3(L"c3");
@@ -38,8 +35,7 @@ int main(int argc,char ** argv) {
   c3->resize(60, 30);
   c3->setposition(90, 10);
   c3->onEnter=[&] ()->void{
-    auto c2 = a.findControlByName(L"c3");
-    c2->setBkColor(rgb(255, 0, 0));
+    c3->setBkColor(rgb(255, 0, 0));
 	  };
   c3->onLeave = [&]()->void {
     auto c2f = a.findControlByName(L"c3");
