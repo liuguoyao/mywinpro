@@ -64,7 +64,7 @@ control_base* app::addChild(control_base& control)
 
 void app::Invalidate()
 {
-  InvalidateRect(hWnd, NULL, TRUE);
+  InvalidateRect(hWnd, NULL, FALSE);
 }
 
 std::vector<control_base*> app::controlsAtPoint(const point& p)
@@ -107,20 +107,40 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   {
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hWnd, &ps);
-    // TODO: 在此处添加使用 hdc 的任何绘图代码...
-    // 设置画笔颜色为黑色  
-    HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
-    HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+
+#define use_double_buffering 
+#ifdef use_double_buffering
+    //双缓冲
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    RECT rect;
+    GetClientRect(hWnd, &rect);
+    HBITMAP hbmMem = CreateCompatibleBitmap(hdc, rect.right - rect.left, rect.bottom - rect.top);
+    HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+    // 填充背景色（可选）  
+    HBRUSH hbr = CreateSolidBrush(RGB(255, 255, 255)); // 白色背景  
+    FillRect(hdcMem, &rect, hbr);
+    DeleteObject(hbr);
+#endif
 
     //draw children
     for (auto &c:childrens)
     {
+#ifdef use_double_buffering
+      c.paint(hdcMem);
+#else
       c.paint(hdc);
+#endif
+      
     }
 
-    // 恢复旧画笔  
-    SelectObject(hdc, hOldPen);
-    DeleteObject(hPen);
+#ifdef use_double_buffering
+    // 将内存DC的内容复制到窗口DC  
+    BitBlt(hdc, 0, 0, rect.right - rect.left, rect.bottom - rect.top, hdcMem, 0, 0, SRCCOPY);
+    // 清理  
+    SelectObject(hdcMem, hbmOld);
+    DeleteDC(hdcMem);
+    DeleteObject(hbmMem);
+#endif
 
     EndPaint(hWnd, &ps);
   }

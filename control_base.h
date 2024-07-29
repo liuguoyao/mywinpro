@@ -5,6 +5,7 @@
 #include "structs.h"
 #include <functional>
 #include <string>
+#include <set>
 
 class control_base
 {
