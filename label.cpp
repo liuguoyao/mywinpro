@@ -5,9 +5,10 @@ label::label():
 {
 }
 
-label::label(const std::wstring &name)
-  :control_base(name)
+label::label(const std::wstring &name, control_base* parent)
+  :control_base(name,parent)
 {
+
 }
 
 label::label(const control_base& other)

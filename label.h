@@ -7,7 +7,7 @@ class label :
 {
 public:
   label();
-  label(const std::wstring &name);
+  label(const std::wstring &name, control_base* parent = nullptr);
   label(const control_base& other);
   label(const control_base&& other);
   void onPaint(HDC hdc) override;

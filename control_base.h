@@ -11,7 +11,7 @@ class control_base
 {
 public:
   control_base() ;
-  control_base(const std::wstring &name) ;
+  control_base(const std::wstring &name, control_base* parent = nullptr) ;
   virtual ~control_base();
   void paint(HDC hdc);
 

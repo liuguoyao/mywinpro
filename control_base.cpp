@@ -18,12 +18,12 @@ control_base::control_base() :
 {
 }
 
-control_base::control_base(const std::wstring &name) :
+control_base::control_base(const std::wstring &name, control_base* parent) :
   x_relative_parent(0),
   y_relative_parent(0),
   height(0),
   with(0),
-  parent(nullptr),
+  parent(parent),
   hover(false),
   onClick([]() {}),
   onDoubleClick([]() {}),
@@ -32,6 +32,11 @@ control_base::control_base(const std::wstring &name) :
   name(name),
   id(0)
 {
+  if (nullptr != parent)
+  {
+    parent->addChild(this);
+  }
+  
 }
 
 control_base::~control_base()
@@ -42,15 +47,8 @@ control_base::~control_base()
 
 void control_base::paint(HDC hdc)
 {
-  //if (parent) { 
-  //  ((control_base*)parent)->onPaint(hdc);
-  //}
-  //else
-  //{
-  //  onPaint(hdc);
-  //}
+
   onPaint(hdc);
-  
   for (auto &c:childrens )
   {
     c->paint(hdc);
