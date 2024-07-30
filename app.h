@@ -10,7 +10,7 @@ class app
     public:
       app();
      int run();
-     control_base* addChild(control_base& control);
+     control_base* addChild(control_base* control);
      void Invalidate();
      std::vector<control_base*> controlsAtPoint(const point &p);
      control_base* findControlByName(const std::wstring& name);
@@ -33,5 +33,5 @@ private:
 private:
   HACCEL hAccelTable;
   HWND hWnd;
-  static std::set<control_base> childrens;
+  static std::set<control_base*> childrens;
 };

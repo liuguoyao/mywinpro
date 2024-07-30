@@ -9,7 +9,7 @@
 #include <stack>
 #include <assert.h>  
 
-std::set<control_base> app::childrens{};
+std::set<control_base*> app::childrens{};
 app::app()
 {
 
@@ -56,14 +56,14 @@ int app::run()
   return (int)msg.wParam;
 }
 
-control_base* app::addChild(control_base& control)
+control_base* app::addChild(control_base* control)
 {
   //childrens.push_back(control);
   //return &childrens.back();
-  std::pair<std::set<control_base>::iterator,bool> pair = childrens.emplace(control);
+  std::pair<std::set<control_base*>::iterator,bool> pair = childrens.emplace(control);
   if (pair.second)
   {
-    return (control_base *)& * pair.first;
+    return (control_base*) *pair.first;
   }
   else {
     MessageBox(hWnd,L"has same name of control",L"", MB_OK);
@@ -135,7 +135,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     for (const auto& c:childrens)
     {
 #ifdef use_double_buffering
-      ((control_base&)c).paint(hdcMem, (control_base*)&c);
+      c->paint(hdcMem);
 #else
       c.paint(hdc);
 #endif
@@ -178,7 +178,7 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
     //r = controlsAtPoint(point(pt.x, pt.y));
     for (const auto& c:childrens)
     {
-      ((control_base&)c).updateState(point(pt.x, pt.y));
+      c->updateState(point(pt.x, pt.y));
     }
     
     return true;

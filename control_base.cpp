@@ -34,98 +34,26 @@ control_base::control_base(const std::wstring &name) :
 {
 }
 
-control_base::control_base(const control_base& ctrl_base)
-{
-  this->childrens = ctrl_base.childrens;
-  this->parent = ctrl_base.parent;
-  this->x_relative_parent = ctrl_base.x_relative_parent;
-  this->y_relative_parent = ctrl_base.y_relative_parent;
-  this->with = ctrl_base.with;
-  this->height = ctrl_base.height;
-  this->hover = ctrl_base.hover;
-  this->onClick = ctrl_base.onClick;
-  this->onDoubleClick = ctrl_base.onDoubleClick;
-  this->onEnter = ctrl_base.onEnter;
-  this->onLeave = ctrl_base.onLeave;
-  this->name = ctrl_base.name;
-  this->id = ctrl_base.id;
-}
-
-control_base::control_base(const control_base&& ctrl_base)
-{
-  this->childrens = ctrl_base.childrens;
-  this->parent = ctrl_base.parent;
-  this->x_relative_parent = ctrl_base.x_relative_parent;
-  this->y_relative_parent = ctrl_base.y_relative_parent;
-  this->with = ctrl_base.with;
-  this->height = ctrl_base.height;
-  this->hover = ctrl_base.hover;
-  this->onClick = ctrl_base.onClick;
-  this->onDoubleClick = ctrl_base.onDoubleClick;
-  this->onEnter = ctrl_base.onEnter;
-  this->onLeave = ctrl_base.onLeave;
-  this->name = ctrl_base.name;
-  this->id = ctrl_base.id;
-}
-
-control_base& control_base::operator=(control_base& ctrl_base)
-{
-  this->childrens = ctrl_base.childrens;
-  this->parent = ctrl_base.parent;
-  this->x_relative_parent = ctrl_base.x_relative_parent;
-  this->y_relative_parent = ctrl_base.y_relative_parent;
-  this->with = ctrl_base.with;
-  this->height = ctrl_base.height;
-  this->hover = ctrl_base.hover;
-  this->onClick = ctrl_base.onClick;
-  this->onDoubleClick = ctrl_base.onDoubleClick;
-  this->onEnter = ctrl_base.onEnter;
-  this->onLeave = ctrl_base.onLeave;
-  this->name = ctrl_base.name;
-  this->id = ctrl_base.id;
-  
-  // TODO: 在此处插入 return 语句
-  return *this;
-}
-
-control_base& control_base::operator=(control_base&& ctrl_base)
-{
-  this->childrens = ctrl_base.childrens;
-  this->parent = ctrl_base.parent;
-  this->x_relative_parent = ctrl_base.x_relative_parent;
-  this->y_relative_parent = ctrl_base.y_relative_parent;
-  this->with = ctrl_base.with;
-  this->height = ctrl_base.height;
-  this->hover = ctrl_base.hover;
-  this->onClick = ctrl_base.onLeave;
-  this->onDoubleClick = ctrl_base.onLeave;
-  this->onEnter = ctrl_base.onLeave;
-  this->onLeave = ctrl_base.onLeave;
-  this->name = ctrl_base.name;
-  this->id = ctrl_base.id;
-  // TODO: 在此处插入 return 语句
-  return *this;
-}
-
 control_base::~control_base()
 {
   std::wostringstream o;
   o << "~ " << this << " " << this->x_relative_parent << "\n";
 }
 
-void control_base::paint(HDC hdc, control_base* parent)
+void control_base::paint(HDC hdc)
 {
-  if (parent) { 
-    parent->onPaint(hdc); 
-  }
-  else
-  {
-    onPaint(hdc);
-  }
+  //if (parent) { 
+  //  ((control_base*)parent)->onPaint(hdc);
+  //}
+  //else
+  //{
+  //  onPaint(hdc);
+  //}
+  onPaint(hdc);
   
   for (auto &c:childrens )
   {
-    ((control_base&)c).paint(hdc, parent);
+    c->paint(hdc);
   }
 
 }
@@ -159,16 +87,12 @@ point control_base::globalposition()
   return curp;
 }
 
-control_base* control_base::addChild(control_base& control)
+control_base* control_base::addChild(control_base* control)
 {
-  //childrens.push_back(control);
-  //auto& c = childrens.back();
-  //c.parent = this;
-  //return &childrens.back();
-  std::pair<std::set<control_base>::iterator, bool> pair = childrens.emplace(control);
+  std::pair<std::set<control_base*>::iterator, bool> pair = childrens.emplace(control);
   if (pair.second)
   {
-    return (control_base*) & *pair.first;
+    return (control_base*)  *pair.first;
   }
   else {
     MessageBox(NULL, L"has same name of control", L"", MB_OK);
@@ -199,7 +123,8 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   }
   for (auto &c:childrens)
   {
-    auto child_ret = ((control_base&)c).controlsAtPoint(p);
+    //auto child_ret = ((control_base&)c).controlsAtPoint(p);
+    auto child_ret = c->controlsAtPoint(p);
     for (auto c2:child_ret)
     {
       ret.push_back(c2);
@@ -229,7 +154,7 @@ void control_base::updateState(const point& global_p)
   }
   for (const auto& c2 : childrens)
   {
-    ((control_base&)c2).updateState(global_p);
+    c2->updateState(global_p);
   }
 }
 

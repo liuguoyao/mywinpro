@@ -43,7 +43,7 @@ int main(int argc,char ** argv) {
   //  };
 
   label lb(L"lb");
-  auto b = a.addChild(lb);
+  auto b = a.addChild(&lb);
   b->resize(60, 30);
   b->setposition(130, 10);
   b->onEnter = [&]()->void {
