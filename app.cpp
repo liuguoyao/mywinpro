@@ -135,7 +135,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     for (const auto& c:childrens)
     {
 #ifdef use_double_buffering
-      ((control_base&)c).paint(hdcMem);
+      ((control_base&)c).paint(hdcMem, (control_base*)&c);
 #else
       c.paint(hdc);
 #endif

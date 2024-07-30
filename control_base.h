@@ -11,13 +11,13 @@ class control_base
 {
 public:
   control_base() ;
-  control_base(std::wstring name) ;
+  control_base(const std::wstring &name) ;
   control_base(const control_base & ctrl_base) ;
   control_base(const control_base && ctrl_base) ;
   control_base& operator=(control_base& ctrl_base);
   control_base& operator=(control_base&& ctrl_base);
   ~control_base();
-  void paint(HDC hdc);
+  void paint(HDC hdc, control_base * parent=nullptr);
 
   void resize(int w,int h);
   void setposition(int x, int y);
@@ -37,7 +37,7 @@ public:
   std::function<void()> onDoubleClick;
 
   //draw
-  void onPaint(HDC hdc);
+  virtual void onPaint(HDC hdc);
 
   bool operator<(const control_base  &other) const;
 
@@ -46,7 +46,7 @@ public:
   int id;
   std::set<control_base> childrens;
 
-private:
+protected:
   int x_relative_parent;
   int y_relative_parent;
   int with;

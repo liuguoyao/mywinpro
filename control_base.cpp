@@ -18,7 +18,7 @@ control_base::control_base() :
 {
 }
 
-control_base::control_base(std::wstring name) :
+control_base::control_base(const std::wstring &name) :
   x_relative_parent(0),
   y_relative_parent(0),
   height(0),
@@ -113,12 +113,19 @@ control_base::~control_base()
   o << "~ " << this << " " << this->x_relative_parent << "\n";
 }
 
-void control_base::paint(HDC hdc)
+void control_base::paint(HDC hdc, control_base* parent)
 {
-  onPaint(hdc);
-  for (auto c:childrens )
+  if (parent) { 
+    parent->onPaint(hdc); 
+  }
+  else
   {
-    c.paint(hdc);
+    onPaint(hdc);
+  }
+  
+  for (auto &c:childrens )
+  {
+    ((control_base&)c).paint(hdc, parent);
   }
 
 }
@@ -259,6 +266,7 @@ void control_base::onPaint(HDC hdc)
   DeleteObject(hBrush);
 
 }
+
 
 bool control_base::operator<(const control_base &other) const
 {
