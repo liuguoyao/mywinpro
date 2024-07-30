@@ -134,10 +134,12 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
 
 void control_base::updateState(const point& global_p)
 {
+  
   if (containsPoint(global_p))
   {
     if (!hover)
     {
+      OutputDebugString((L"onEnter " + name + L" \n").c_str());
       hover = true;
       onEnter();
     }

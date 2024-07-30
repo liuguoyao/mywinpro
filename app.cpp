@@ -172,7 +172,7 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
   switch (lpMsg->message)
   {
   case WM_LBUTTONDOWN:
-  //case WM_MOUSEMOVE:
+  case WM_MOUSEMOVE:
     POINT pt = lpMsg->pt;
     ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
     //r = controlsAtPoint(point(pt.x, pt.y));
@@ -181,8 +181,8 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
       c->updateState(point(pt.x, pt.y));
     }
     
-    return true;
-    //break;
+    //return true;
+    break;
 
   default:
     break;

@@ -3,6 +3,7 @@
 
 #include "control_base.h"
 #include "label.h"
+#include "button.h"
 #include <map>
 #include <memory>
 
@@ -13,6 +14,7 @@ public:
 	Ctrls& operator=(const Ctrls&) = delete;
 	control_base* create_base(std::wstring name, control_base* parent);
 	label* create_label(std::wstring name,control_base* parent = nullptr);
+	button* create_button(std::wstring name,control_base* parent = nullptr);
 private:
 	Ctrls();
 	std::map<std::wstring, std::unique_ptr<control_base>> m_controls;
