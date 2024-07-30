@@ -170,7 +170,6 @@ void control_base::onPaint(HDC hdc)
   point relativep = globalposition();
   p1 += relativep;
   p2 += relativep;
-  //Rectangle(hdc,p1.x,p1.y , p2.x, p2.y);
 
   HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
   rgb color;

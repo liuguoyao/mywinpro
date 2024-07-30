@@ -11,6 +11,7 @@ public:
 	static Ctrls& instance();
 	Ctrls(const Ctrls&) = delete;
 	Ctrls& operator=(const Ctrls&) = delete;
+	control_base* create_base(std::wstring name, control_base* parent);
 	label* create_label(std::wstring name,control_base* parent = nullptr);
 private:
 	Ctrls();
