@@ -34,5 +34,8 @@ private:
 private:
   HACCEL hAccelTable;
   HWND hWnd;
+  UINT_PTR uTimerId;
+  static app* instance;
+  static long long last_update_time;
   static std::set<control_base*> childrens;
 };

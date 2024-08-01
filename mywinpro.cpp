@@ -11,6 +11,13 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
 WCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
 int nCmdShow;
 
+//color 
+rgb borderColor(0x40, 0x51, 0x4e);
+rgb hoverColor(0xe4, 0xf9, 0xf5);
+rgb activeColor(0x30, 0xe3, 0xca);
+rgb backgroundColor(0xf9, 0xf7, 0xf7);
+rgb fontColor(0x40, 0x51, 0x4e);
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,

@@ -21,13 +21,19 @@ class rgb
 {
 public:
   rgb();
-  rgb(int r, int g, int b);
+  rgb(double r, double g, double b);
   rgb(const rgb & other);
   rgb(rgb && other);
   rgb& operator=(const rgb& other);
   rgb& operator=( rgb&& other);
+  rgb&& operator-(const rgb& other);
+  rgb&& operator+(const rgb& other);
+  rgb&& operator*(const int num);
+  rgb&& operator/(const int num);
+  rgb& operator+=(const rgb& other);
+  long abs();
   
-  int r; int g; int b;
+  double r; double g; double b;
 };
 
 #endif

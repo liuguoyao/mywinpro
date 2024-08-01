@@ -22,8 +22,8 @@ public:
   control_base* addChild(control_base *control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
-  void updateState(const point &p);
-
+  void updateMousePosition(const point &p);
+  void updateState(long long delt_time);
   void setBkColor(const rgb &rgb );
 
   //mouse event
@@ -34,6 +34,7 @@ public:
 
   //draw
   virtual void onPaint(HDC hdc);
+  virtual void onupdateAnimState(long long delt_time);
 
   bool operator<(const control_base  &other) const;
 
@@ -49,7 +50,6 @@ protected:
   int height;
   
   control_base* parent;
-  rgb bkrgb;
   bool hover;
 
   //box model
@@ -57,7 +57,22 @@ protected:
   int borderWidth;
   int padding;
 
-  
+  //color
+  rgb borderColor;
+  rgb hoverColor;
+  rgb activeColor;
+  rgb backgroundColor;
+  rgb fontColor;
+  rgb curborderColor;
+  rgb curhoverColor;
+  rgb curactiveColor;
+  rgb curbackgroundColor;
+  rgb curfontColor;
+  rgb deltaborderColor;
+  rgb deltahoverColor;
+  rgb deltaactiveColor;
+  rgb deltabackgroundColor;
+  rgb deltafontColor;
 
 };
 

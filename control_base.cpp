@@ -1,5 +1,7 @@
 #include "control_base.h"
 #include "structs.h"
+#include "global_var.h"
+#include<limits>
 #include <sstream>
 
 control_base::control_base() :
@@ -30,7 +32,22 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   onEnter([]() {}),
   onLeave([]() {}),
   name(name),
-  id(0)
+  id(0),
+  borderColor(::borderColor),
+  hoverColor(::hoverColor),
+  activeColor(::activeColor),
+  backgroundColor(::backgroundColor),
+  fontColor(::fontColor),
+  curborderColor(::borderColor),
+  curhoverColor(::hoverColor),
+  curactiveColor(::activeColor),
+  curbackgroundColor(::backgroundColor),
+  curfontColor(::fontColor),
+  deltaborderColor(0,0,0),
+  deltahoverColor(0, 0, 0),
+  deltaactiveColor(0, 0, 0),
+  deltabackgroundColor(0, 0, 0),
+  deltafontColor(0, 0, 0)
 {
   if (nullptr != parent)
   {
@@ -132,7 +149,7 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   return ret;
 }
 
-void control_base::updateState(const point& global_p)
+void control_base::updateMousePosition(const point& global_p)
 {
   
   if (containsPoint(global_p))
@@ -154,15 +171,23 @@ void control_base::updateState(const point& global_p)
   }
   for (const auto& c2 : childrens)
   {
-    c2->updateState(global_p);
+    c2->updateMousePosition(global_p);
   }
 }
 
-
-
-void control_base::setBkColor(const rgb& rgb)
+void control_base::updateState(long long delt_time)
 {
-  bkrgb = rgb;
+  onupdateAnimState(delt_time);
+  for (const auto& c2 : childrens)
+  {
+    c2->updateState(delt_time);
+  }
+}
+
+void control_base::setBkColor(const rgb& bkcolor)
+{
+  backgroundColor = bkcolor;
+  deltabackgroundColor = (backgroundColor - curbackgroundColor)/3.0f;
 }
 
 void control_base::onPaint(HDC hdc)
@@ -175,7 +200,7 @@ void control_base::onPaint(HDC hdc)
 
   HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
   rgb color;
-  HBRUSH hBrush = CreateSolidBrush(RGB(bkrgb.r, bkrgb.g, bkrgb.b));
+  HBRUSH hBrush = CreateSolidBrush(RGB(curbackgroundColor.r, curbackgroundColor.g, curbackgroundColor.b));
   HGDIOBJ oldPen = SelectObject(hdc, hPen);
   HGDIOBJ oldBrush = SelectObject(hdc, hBrush);
 
@@ -189,6 +214,17 @@ void control_base::onPaint(HDC hdc)
   DeleteObject(hPen);
   DeleteObject(hBrush);
 
+}
+
+void control_base::onupdateAnimState(long long delt_time)
+{
+  if (deltabackgroundColor.abs() > FLT_MIN) {
+    curbackgroundColor += deltabackgroundColor;
+    if ((curbackgroundColor-backgroundColor).abs()<FLT_MIN)
+    {
+      deltabackgroundColor = rgb(0,0,0);
+    }
+  }
 }
 
 

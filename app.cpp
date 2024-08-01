@@ -7,9 +7,11 @@
 #include <sstream>
 #include<vector>
 #include <stack>
-#include <assert.h>  
+#include <chrono>
 
 std::set<control_base*> app::childrens{};
+long long app::last_update_time = 0;
+app* app::instance = nullptr;
 app::app()
 {
 
@@ -33,10 +35,14 @@ app::app()
   hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
     CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInst, nullptr);
 
+  uTimerId = SetTimer(hWnd, 0, 40, NULL); //25hz
+
   ShowWindow(hWnd, nCmdShow);
   UpdateWindow(hWnd);
   
   hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_MYWINPRO));
+
+  instance = this;
 }
 
 int app::run()
@@ -52,7 +58,7 @@ int app::run()
       DispatchMessage(&msg);
     }
   }
-
+  KillTimer(hWnd, uTimerId);
   return (int)msg.wParam;
 }
 
@@ -154,6 +160,18 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     EndPaint(hWnd, &ps);
   }
   break;
+  case WM_TIMER: {
+    auto now = std::chrono::system_clock::now();
+    auto seconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    auto delta_time = seconds - last_update_time;
+    last_update_time = seconds;
+    for (const auto& c : childrens)
+    {
+      c->updateState(delta_time);
+    }
+    instance->Invalidate();
+  }
+  break;
   case WM_DESTROY:
     PostQuitMessage(0);
     break;
@@ -178,7 +196,7 @@ BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
     //r = controlsAtPoint(point(pt.x, pt.y));
     for (const auto& c:childrens)
     {
-      c->updateState(point(pt.x, pt.y));
+      c->updateMousePosition(point(pt.x, pt.y));
     }
     
     //return true;

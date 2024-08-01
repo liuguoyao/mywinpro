@@ -1,4 +1,5 @@
 #include "structs.h"
+#include <memory>
 
 point::point():
   x(0),
@@ -60,7 +61,7 @@ rgb::rgb():r(255), g(255), b(255)
 
 }
 
-rgb::rgb(int r, int g, int b)
+rgb::rgb(double r, double g, double b)
 {
   this->r = r;
   this->g = g;
@@ -97,4 +98,38 @@ rgb& rgb::operator=(rgb&& other)
   b = other.b;
   // TODO: 在此处插入 return 语句
   return *this;
+}
+
+rgb&& rgb::operator-(const rgb& other)
+{
+  return std::move(rgb(r - other.r, g - other.g, b - other.b));
+}
+
+rgb&& rgb::operator+(const rgb& other)
+{
+  return std::move(rgb(r+other.r, g + other.g, b + other.b));
+}
+
+rgb&& rgb::operator*(const int num)
+{
+  return std::move(rgb(r * num, g * num, b * num));
+}
+
+rgb&& rgb::operator/(const int num)
+{
+  return std::move(rgb(r / num, g / num, b / num));
+}
+
+rgb& rgb::operator+=(const rgb& other)
+{
+  r += other.r;
+  g += other.g;
+  b += other.b;
+  // TODO: 在此处插入 return 语句
+  return *this;
+}
+
+long rgb::abs()
+{
+  return ::abs(r)+::abs(g)+::abs(b);
 }

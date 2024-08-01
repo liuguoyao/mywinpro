@@ -1,5 +1,6 @@
 #include "app.h"
 #include "control_base.h"
+#include "global_var.h"
 #include <sstream>
 #include "label.h"
 #include "Ctrls.h"
@@ -27,16 +28,16 @@ int main(int argc,char ** argv) {
   f->setposition(270, 10);
 
   c->onEnter = [&]()->void {
-    c->setBkColor(rgb(0, 220, 0));
+    c->setBkColor(::hoverColor);
     };
   c->onLeave = [&]()->void {
-    c->setBkColor(rgb(220, 220, 220));
+    c->setBkColor(::backgroundColor);
     };
   b->onEnter = [&]()->void {
-    b->setBkColor(rgb(255, 0, 0));
+    b->setBkColor(::hoverColor);
     };
   b->onLeave = [&]()->void {
-    b->setBkColor(rgb(220, 220, 220));
+    b->setBkColor(::backgroundColor);
     };
 
   a.addChild(c);
