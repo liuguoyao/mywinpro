@@ -14,6 +14,7 @@ int main(int argc,char ** argv) {
   auto e = Ctrls::instance().create_label(L"labele", c);
   auto f = Ctrls::instance().create_button(L"button", c);
   
+  
   c->resize(60, 30);
   c->setposition(10, 10);
 
@@ -41,5 +42,6 @@ int main(int argc,char ** argv) {
     };
 
   a.addChild(c);
+
   return a.run();
 }

@@ -41,17 +41,3 @@ void button::onupdateAnimState(long long delta_time)
   }
 }
 
-void button::invalidate()
-{
-  HWND hwnd = GetActiveWindow();
-  RECT rect = rect_global();
-  InvalidateRect(hwnd, &rect, false);
-}
-
-RECT button::rect_global()
-{
-  point p1(x_relative_parent, y_relative_parent);
-  p1 += globalposition();
-  RECT rect = { p1.x, p1.y, p1.x + with, p1.y + height };
-  return rect;
-}

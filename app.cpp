@@ -169,7 +169,6 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
       c->updateState(delta_time);
     }
-    instance->Invalidate();
   }
   break;
   case WM_DESTROY:
@@ -183,30 +182,21 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
 {
-  std::wostringstream o;
-  o << "TranslateMessage" << lpMsg->message << "\n";
-
-  std::vector<control_base*> r;
   switch (lpMsg->message)
   {
   case WM_LBUTTONDOWN:
+    break;
   case WM_MOUSEMOVE:
     POINT pt = lpMsg->pt;
     ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
-    //r = controlsAtPoint(point(pt.x, pt.y));
     for (const auto& c:childrens)
     {
       c->updateMousePosition(point(pt.x, pt.y));
     }
-    
-    //return true;
     break;
-
   default:
     break;
   }
-  Invalidate();
-
 
   return ::TranslateMessage( lpMsg);
 }
@@ -229,9 +219,9 @@ LRESULT __stdcall app::DispatchMessage(const MSG* lpMsg)
 control_base* app::findControlByName(const std::wstring& name)
 {
   std::stack<control_base*> stack;
-  for (const auto& c : childrens)
+  for (const auto c : childrens)
   {
-    stack.push((control_base*) & c);
+    stack.push(c);
   }
 
   while (!stack.empty())
@@ -239,9 +229,9 @@ control_base* app::findControlByName(const std::wstring& name)
     control_base* cur = stack.top();
     stack.pop();
     if (name != cur->name) {
-      for (const auto& c1 : cur->childrens)
+      for (const auto c1 : cur->childrens)
       {
-        stack.push((control_base* ) & c1);
+        stack.push(c1);
       }
     }
     else

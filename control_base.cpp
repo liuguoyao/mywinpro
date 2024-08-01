@@ -1,6 +1,7 @@
 #include "control_base.h"
 #include "structs.h"
 #include "global_var.h"
+#include "app.h"
 #include<limits>
 #include <sstream>
 
@@ -33,6 +34,7 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   onLeave([]() {}),
   name(name),
   id(0),
+  needupdate(true),
   borderColor(::borderColor),
   hoverColor(::hoverColor),
   activeColor(::activeColor),
@@ -173,11 +175,15 @@ void control_base::updateMousePosition(const point& global_p)
   {
     c2->updateMousePosition(global_p);
   }
+  needupdate = true;
 }
 
 void control_base::updateState(long long delt_time)
 {
   onupdateAnimState(delt_time);
+
+  if (needupdate) invalidate();
+
   for (const auto& c2 : childrens)
   {
     c2->updateState(delt_time);
@@ -224,6 +230,7 @@ void control_base::onupdateAnimState(long long delt_time)
     {
       deltabackgroundColor = rgb(0,0,0);
     }
+    needupdate = true;
   }
 }
 
@@ -231,4 +238,18 @@ void control_base::onupdateAnimState(long long delt_time)
 bool control_base::operator<(const control_base &other) const
 {
   return this->name<other.name;
+}
+
+void control_base::invalidate()
+{
+  RECT rect = rect_global();
+  InvalidateRect(app::instance->hWnd, &rect, false);
+}
+
+RECT control_base::rect_global()
+{
+  point p1(x_relative_parent, y_relative_parent);
+  p1 += globalposition();
+  RECT rect = { p1.x, p1.y, p1.x + with, p1.y + height };
+  return rect;
 }

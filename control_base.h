@@ -36,12 +36,17 @@ public:
   virtual void onPaint(HDC hdc);
   virtual void onupdateAnimState(long long delt_time);
 
+  void invalidate();
+
   bool operator<(const control_base  &other) const;
 
 public:
   std::wstring name;
   int id;
   std::set<control_base*> childrens;
+
+protected:
+  RECT rect_global(); 
 
 protected:
   int x_relative_parent;
@@ -73,6 +78,9 @@ protected:
   rgb deltaactiveColor;
   rgb deltabackgroundColor;
   rgb deltafontColor;
+
+private:
+  bool needupdate;
 
 };
 
