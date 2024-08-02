@@ -9,7 +9,12 @@
 class app
 {
     public:
-      app();
+     app(app&)=delete;
+     app(app&&)=delete;
+     app& operator=(app&)=delete;
+     app& operator=(app&&)=delete;
+     static app& getInstance();
+
      int run();
      control_base* addChild(control_base* control);
      void Invalidate();
@@ -17,22 +22,13 @@ class app
      control_base* findControlByName(const std::wstring& name);
 
 private:
+  app();
   static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-  BOOL WINAPI TranslateMessage( _In_ CONST MSG* lpMsg);
-  int
-    WINAPI
-    TranslateAccelerator(
-      _In_ HWND hWnd,
-      _In_ HACCEL hAccTable,
-      _In_ LPMSG lpMsg);
-  LRESULT
-    WINAPI
-    DispatchMessage(
-      _In_ CONST MSG* lpMsg);
+
 
 public:
   HWND hWnd;
-  static app* instance;
+
 private:
   HACCEL hAccelTable;
   UINT_PTR uTimerId;

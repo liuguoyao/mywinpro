@@ -243,7 +243,7 @@ bool control_base::operator<(const control_base &other) const
 void control_base::invalidate()
 {
   RECT rect = rect_global();
-  InvalidateRect(app::instance->hWnd, &rect, false);
+  InvalidateRect(app::getInstance().hWnd, &rect, false);
 }
 
 RECT control_base::rect_global()

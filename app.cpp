@@ -11,13 +11,12 @@
 
 std::set<control_base*> app::childrens{};
 long long app::last_update_time = 0;
-app* app::instance = nullptr;
 app::app()
 {
 
   WNDCLASSEXW wcex;
   wcex.cbSize = sizeof(WNDCLASSEX);
-  wcex.style = CS_HREDRAW | CS_VREDRAW;
+  wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
   wcex.lpfnWndProc = WndProc;
   wcex.cbClsExtra = 0;
   wcex.cbWndExtra = 0;
@@ -42,7 +41,12 @@ app::app()
   
   hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_MYWINPRO));
 
-  instance = this;
+}
+
+app& app::getInstance()
+{
+  static app instance;
+  return instance;
 }
 
 int app::run()
@@ -101,6 +105,25 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
+  case WM_LBUTTONDOWN:
+    //OutputDebugString(L"WM_LBUTTONDOWN\n");
+    break;
+  case WM_LBUTTONUP:
+    //OutputDebugString(L"WM_LBUTTONUP\n");
+    break;
+  case WM_LBUTTONDBLCLK:
+    OutputDebugString(L"WM_LBUTTONDBLCLK WndProc\n");
+    break;
+  case WM_MOUSEMOVE:
+  {
+    POINT pt{ LOWORD(lParam),HIWORD(lParam) };
+    //ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
+    for (const auto& c : childrens)
+    {
+      c->updateMousePosition(point(pt.x, pt.y));
+    }
+  }
+   break;
   case WM_COMMAND:
   {
     int wmId = LOWORD(wParam);
@@ -178,42 +201,6 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd, message, wParam, lParam);
   }
   return 0;
-}
-
-BOOL __stdcall app::TranslateMessage(const MSG* lpMsg)
-{
-  switch (lpMsg->message)
-  {
-  case WM_LBUTTONDOWN:
-    break;
-  case WM_MOUSEMOVE:
-    POINT pt = lpMsg->pt;
-    ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
-    for (const auto& c:childrens)
-    {
-      c->updateMousePosition(point(pt.x, pt.y));
-    }
-    break;
-  default:
-    break;
-  }
-
-  return ::TranslateMessage( lpMsg);
-}
-
-int __stdcall app::TranslateAccelerator(HWND hWnd, HACCEL hAccTable, LPMSG lpMsg)
-{
-  std::wostringstream o;
-  o << "TranslateAccelerator" <<  std::hex <<lpMsg->message << "\n";
-
-  return ::TranslateAccelerator(hWnd,  hAccTable,  lpMsg);
-}
-
-LRESULT __stdcall app::DispatchMessage(const MSG* lpMsg)
-{
-  std::wostringstream o;
-  o << "DispatchMessage" << lpMsg->message << "\n";
-  return ::DispatchMessage(lpMsg);
 }
 
 control_base* app::findControlByName(const std::wstring& name)

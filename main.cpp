@@ -6,7 +6,7 @@
 #include "Ctrls.h"
 
 int main(int argc,char ** argv) {
-  app a;
+  app& a = app::getInstance();
 
   auto c = Ctrls::instance().create_label(L"c", nullptr);
   auto b = Ctrls::instance().create_base(L"label", c);
