@@ -16,7 +16,7 @@ app::app()
 
   WNDCLASSEXW wcex;
   wcex.cbSize = sizeof(WNDCLASSEX);
-  wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+  wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS| CS_DROPSHADOW;
   wcex.lpfnWndProc = WndProc;
   wcex.cbClsExtra = 0;
   wcex.cbWndExtra = 0;
@@ -68,8 +68,6 @@ int app::run()
 
 control_base* app::addChild(control_base* control)
 {
-  //childrens.push_back(control);
-  //return &childrens.back();
   std::pair<std::set<control_base*>::iterator,bool> pair = childrens.emplace(control);
   if (pair.second)
   {
@@ -91,7 +89,7 @@ std::vector<control_base*> app::controlsAtPoint(const point& p)
   std::vector<control_base*> children_contrains_point;
   for (const auto& c:childrens)
   {
-    auto childrens_contain = ((control_base&)c).controlsAtPoint(p);
+    auto childrens_contain = c->controlsAtPoint(p);
 
     for (auto &c2 : childrens_contain)
     {
@@ -105,24 +103,12 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
-  case WM_LBUTTONDOWN:
-    //OutputDebugString(L"WM_LBUTTONDOWN\n");
-    break;
   case WM_LBUTTONUP:
-    //OutputDebugString(L"WM_LBUTTONUP\n");
-    break;
+  case WM_LBUTTONDOWN:
   case WM_LBUTTONDBLCLK:
-    OutputDebugString(L"WM_LBUTTONDBLCLK WndProc\n");
-    break;
   case WM_MOUSEMOVE:
-  {
-    POINT pt{ LOWORD(lParam),HIWORD(lParam) };
-    //ScreenToClient(hWnd, &pt); // 将屏幕坐标转换为窗口坐标  
     for (const auto& c : childrens)
-    {
-      c->updateMousePosition(point(pt.x, pt.y));
-    }
-  }
+      c->processEvent(evt(LOWORD(lParam), HIWORD(lParam), message, wParam));
    break;
   case WM_COMMAND:
   {
@@ -168,7 +154,6 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 #else
       c.paint(hdc);
 #endif
-      
     }
 
 #ifdef use_double_buffering

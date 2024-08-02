@@ -13,7 +13,6 @@ public:
   int x;
   int y;
   point operator + (point &a);
-  //point& operator += (point& a);
   point& operator += (point a);
 };
 
@@ -34,6 +33,20 @@ public:
   long abs();
   
   double r; double g; double b;
+};
+
+class evt
+{
+public:
+  evt();
+  evt(int x,int y,int type,int button);
+  evt(const evt& other);
+  evt& operator=(const evt& other);
+
+  int x;
+  int y;
+  int type;
+  int button;
 };
 
 #endif

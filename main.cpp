@@ -34,12 +34,12 @@ int main(int argc,char ** argv) {
   c->onLeave = [&]()->void {
     c->setBkColor(::backgroundColor);
     };
-  b->onEnter = [&]()->void {
-    b->setBkColor(::hoverColor);
-    };
-  b->onLeave = [&]()->void {
-    b->setBkColor(::backgroundColor);
-    };
+  //b->onEnter = [&]()->void {
+  //  b->setBkColor(::hoverColor);
+  //  };
+  //b->onLeave = [&]()->void {
+  //  b->setBkColor(::backgroundColor);
+  //  };
 
   a.addChild(c);
 

@@ -22,7 +22,10 @@ public:
   control_base* addChild(control_base *control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
-  void updateMousePosition(const point &p);
+
+  // event process
+  bool processEvent(evt e);
+  void onMouseMove(const point &p);
   void updateState(long long delt_time);
   void setBkColor(const rgb &rgb );
 
@@ -78,6 +81,14 @@ protected:
   rgb deltaactiveColor;
   rgb deltabackgroundColor;
   rgb deltafontColor;
+
+  // mouse state
+  bool mouseLeftButtonDown;
+  bool mouseRightButtonDown;
+  bool mouseLeftButtonUp;
+  bool mouseRightButtonUp;
+  bool mouseLeftButtonClick;
+
 
 private:
   bool needupdate;

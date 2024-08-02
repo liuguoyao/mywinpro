@@ -5,6 +5,7 @@
 #include<limits>
 #include <sstream>
 
+
 control_base::control_base() :
   x_relative_parent(0),
   y_relative_parent(0),
@@ -49,7 +50,12 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   deltahoverColor(0, 0, 0),
   deltaactiveColor(0, 0, 0),
   deltabackgroundColor(0, 0, 0),
-  deltafontColor(0, 0, 0)
+  deltafontColor(0, 0, 0),
+  mouseLeftButtonDown(false),
+  mouseRightButtonDown(false),
+  mouseLeftButtonUp(false),
+  mouseRightButtonUp(false),
+  mouseLeftButtonClick(false)
 {
   if (nullptr != parent)
   {
@@ -151,14 +157,55 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   return ret;
 }
 
-void control_base::updateMousePosition(const point& global_p)
+bool control_base::processEvent(evt e)
+{
+  for (auto c : childrens)
+  {
+    //if(c->processEvent(e)) return true;
+    c->processEvent(e);
+  }
+
+  if (!containsPoint(point(e.x, e.y))
+    && e.type != WM_MOUSEMOVE
+    && e.type != WM_LBUTTONUP
+    ) {
+
+    return false;
+  }
+  switch (e.type)
+  {
+  case WM_MOUSEMOVE:
+    if(!mouseLeftButtonDown)
+      onMouseMove(point(e.x,e.y));
+    break;
+  case WM_LBUTTONDOWN:
+    mouseLeftButtonDown=true;
+    setBkColor(::clickDownColor);
+    break;
+  case WM_LBUTTONUP:
+    if (mouseLeftButtonDown)
+    {
+      mouseLeftButtonDown = false;
+      setBkColor(::backgroundColor);
+    }
+    OutputDebugString((name + L" WM_LBUTTONUP base\n").c_str());
+    break;
+  case WM_LBUTTONDBLCLK:
+    OutputDebugString((name + L" WM_LBUTTONDBLCLK\n").c_str());
+    break;
+  default:
+    break;
+  }
+  return false;
+}
+
+void control_base::onMouseMove(const point& global_p)
 {
   
   if (containsPoint(global_p))
   {
     if (!hover)
     {
-      OutputDebugString((L"onEnter " + name + L" \n").c_str());
       hover = true;
       onEnter();
     }
@@ -173,7 +220,7 @@ void control_base::updateMousePosition(const point& global_p)
   }
   for (const auto& c2 : childrens)
   {
-    c2->updateMousePosition(global_p);
+    c2->onMouseMove(global_p);
   }
   needupdate = true;
 }

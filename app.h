@@ -5,6 +5,7 @@
 #include <string>
 #include <set>
 #include "Ctrls.h"
+#define APP app::getInstance()
 
 class app
 {
@@ -24,7 +25,6 @@ class app
 private:
   app();
   static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
 
 public:
   HWND hWnd;

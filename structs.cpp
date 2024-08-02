@@ -43,12 +43,7 @@ point point::operator+(point &a)
 {
   return point(a.x+x,a.y+y);
 }
-//point& point::operator+=(point& a)
-//{
-//  x += a.x;
-//  y += a.y;
-//  return *this;
-//}
+
 point& point::operator+=(point a)
 {
   x += a.x;
@@ -132,4 +127,33 @@ rgb& rgb::operator+=(const rgb& other)
 long rgb::abs()
 {
   return ::abs(r)+::abs(g)+::abs(b);
+}
+
+evt::evt()
+{
+}
+evt::evt(int x, int y, int type, int button)
+  :x(x),
+  y(y),
+  type(type),
+  button(button)
+{
+}
+
+evt::evt(const evt& other)
+{
+  x = other.x;
+  y = other.y;
+  type = other.type;
+  button = other.button;
+}
+
+evt& evt::operator=(const evt& other)
+{
+  // TODO: 在此处插入 return 语句
+  x = other.x;
+  y = other.y;
+  type = other.type;
+  button = other.button;
+  return *this;
 }

@@ -14,6 +14,7 @@ int main(int argc, char** argv);
 //color
 extern rgb borderColor;
 extern rgb hoverColor;
+extern rgb clickDownColor;
 extern rgb activeColor;
 extern rgb backgroundColor;
 extern rgb fontColor;
