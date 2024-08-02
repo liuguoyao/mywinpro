@@ -5,23 +5,6 @@
 #include<limits>
 #include <sstream>
 
-
-control_base::control_base() :
-  x_relative_parent(0),
-  y_relative_parent(0),
-  height(0),
-  with(0),
-  parent(nullptr),
-  hover(false),
-    onClick([]() {}),
-    onDoubleClick([]() {}),
-    onEnter([]() {}),
-    onLeave([]() {}),
-  name(L""),
-  id(0)
-{
-}
-
 control_base::control_base(const std::wstring &name, control_base* parent) :
   x_relative_parent(0),
   y_relative_parent(0),
@@ -33,6 +16,9 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   onDoubleClick([]() {}),
   onEnter([]() {}),
   onLeave([]() {}),
+  onLButtonDown([]() {}),
+  onLButtonUp([]() {}),
+  onLButtonDBLClick([]() {}),
   name(name),
   id(0),
   needupdate(true),
@@ -180,18 +166,17 @@ bool control_base::processEvent(evt e)
     break;
   case WM_LBUTTONDOWN:
     mouseLeftButtonDown=true;
-    setBkColor(::clickDownColor);
+    onLButtonDown();
     break;
   case WM_LBUTTONUP:
     if (mouseLeftButtonDown)
     {
       mouseLeftButtonDown = false;
-      setBkColor(::backgroundColor);
+      onLButtonUp();
     }
-    OutputDebugString((name + L" WM_LBUTTONUP base\n").c_str());
     break;
   case WM_LBUTTONDBLCLK:
-    OutputDebugString((name + L" WM_LBUTTONDBLCLK\n").c_str());
+    onLButtonDBLClick();
     break;
   default:
     break;
@@ -215,7 +200,8 @@ void control_base::onMouseMove(const point& global_p)
     if (hover)
     {
       hover = false;
-      onLeave();
+      if(!mouseLeftButtonDown)
+        onLeave();
     }
   }
   for (const auto& c2 : childrens)

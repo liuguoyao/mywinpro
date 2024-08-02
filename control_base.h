@@ -9,8 +9,9 @@
 
 class control_base
 {
+
 public:
-  control_base() ;
+  control_base() {};
   control_base(const std::wstring &name, control_base* parent = nullptr) ;
   virtual ~control_base();
   void paint(HDC hdc);
@@ -26,6 +27,10 @@ public:
   // event process
   bool processEvent(evt e);
   void onMouseMove(const point &p);
+  //void onLButtonDown();
+  //void onLButtonUp();
+  //void onLButtonDBLClick();
+
   void updateState(long long delt_time);
   void setBkColor(const rgb &rgb );
 
@@ -34,6 +39,9 @@ public:
   std::function<void()> onLeave;
   std::function<void()> onClick;
   std::function<void()> onDoubleClick;
+  std::function<void()> onLButtonDown;
+  std::function<void()> onLButtonUp;
+  std::function<void()> onLButtonDBLClick;
 
   //draw
   virtual void onPaint(HDC hdc);

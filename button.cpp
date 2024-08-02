@@ -9,12 +9,18 @@ button::button()
 button::button(std::wstring name, control_base* parent)
   : control_base(name, parent)
 {
-  //this->onEnter = [&]() {
-  //    setBkColor(::hoverColor);
-  //  };
-  //this->onLeave = [&]() {
-  //  setBkColor(::backgroundColor);
-  //  };
+  this->onEnter = [&]() {
+      setBkColor(::hoverColor);
+    };
+  this->onLeave = [&]() {
+    setBkColor(::backgroundColor);
+    };
+  this->onLButtonDown = [&]() {
+    setBkColor(::clickDownColor);
+    };
+  this->onLButtonUp = [&]() {
+    setBkColor(::backgroundColor);
+    };
 
 }
 
