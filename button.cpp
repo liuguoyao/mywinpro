@@ -39,6 +39,16 @@ void button::onPaint(HDC hdc)
   DrawText(hdc, name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOCLIP);
 }
 
+void button::processMouseEnter()
+{
+  control_base::processMouseEnter();
+  setBkColor(::hoverColor);
+}
+void button::processMouseLeave()
+{
+  control_base::processMouseLeave();
+  setBkColor(::backgroundColor);
+}
 void button::onupdateAnimState(long long delta_time)
 {
   control_base::onupdateAnimState(delta_time);
@@ -56,7 +66,7 @@ void button::processLButtonDown()
 void button::processLButtonUp()
 {
   control_base::processLButtonUp();
-  setBkColor(::backgroundColor);
+  hover?setBkColor(::hoverColor):setBkColor(::backgroundColor);
 }
 
 void button::processLButtonDBLClick()

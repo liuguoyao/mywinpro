@@ -108,7 +108,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   case WM_LBUTTONDBLCLK:
   case WM_MOUSEMOVE:
     for (const auto& c : childrens)
-      c->processEvent(evt(LOWORD(lParam), HIWORD(lParam), message, wParam));
+      c->processEvent(evt(LOWORD(lParam), HIWORD(lParam), message, (int)wParam));
    break;
   case WM_COMMAND:
   {

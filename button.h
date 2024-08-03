@@ -13,6 +13,8 @@ public:
   virtual void processLButtonDown() override;
   virtual void processLButtonUp() override;
   virtual void processLButtonDBLClick() override;
+  virtual void processMouseEnter();
+  virtual void processMouseLeave();
 
 private:
 

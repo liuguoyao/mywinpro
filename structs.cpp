@@ -124,7 +124,7 @@ rgb& rgb::operator+=(const rgb& other)
   return *this;
 }
 
-long rgb::abs()
+double rgb::abs()
 {
   return ::abs(r)+::abs(g)+::abs(b);
 }

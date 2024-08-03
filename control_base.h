@@ -27,6 +27,8 @@ public:
   // event process
   virtual bool processEvent(evt e);
   virtual void processMouseMove(const point &p);
+  virtual void processMouseEnter();
+  virtual void processMouseLeave();
   virtual void processLButtonDown();
   virtual void processLButtonUp();
   virtual void processLButtonDBLClick();

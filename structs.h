@@ -30,7 +30,7 @@ public:
   rgb&& operator*(const int num);
   rgb&& operator/(const int num);
   rgb& operator+=(const rgb& other);
-  long abs();
+  double abs();
   
   double r; double g; double b;
 };

@@ -193,16 +193,18 @@ void control_base::processMouseMove(const point& global_p)
     if (!hover)
     {
       hover = true;
-      onEnter();
+      processMouseEnter();
     }
   }
   else
   {
     if (hover)
     {
-      hover = false;
-      if(!mouseLeftButtonDown)
-        onLeave();
+      if (!mouseLeftButtonDown) {
+        hover = false;
+        processMouseLeave();
+      }
+        
     }
   }
   for (const auto& c2 : childrens)
@@ -210,6 +212,16 @@ void control_base::processMouseMove(const point& global_p)
     c2->processMouseMove(global_p);
   }
   needupdate = true;
+}
+
+void control_base::processMouseEnter()
+{
+  onEnter();
+}
+
+void control_base::processMouseLeave()
+{
+  onLeave();
 }
 
 void control_base::processLButtonDown()
@@ -275,8 +287,9 @@ void control_base::onupdateAnimState(long long delt_time)
 {
   if (deltabackgroundColor.abs() > FLT_MIN) {
     curbackgroundColor += deltabackgroundColor;
-    if ((curbackgroundColor-backgroundColor).abs()<FLT_MIN)
+    if ((curbackgroundColor - backgroundColor).abs() < 0.1f)
     {
+      curbackgroundColor = backgroundColor;
       deltabackgroundColor = rgb(0,0,0);
     }
     needupdate = true;
