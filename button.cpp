@@ -9,18 +9,18 @@ button::button()
 button::button(std::wstring name, control_base* parent)
   : control_base(name, parent)
 {
-  this->onEnter = [&]() {
-      setBkColor(::hoverColor);
-    };
-  this->onLeave = [&]() {
-    setBkColor(::backgroundColor);
-    };
-  this->onLButtonDown = [&]() {
-    setBkColor(::clickDownColor);
-    };
-  this->onLButtonUp = [&]() {
-    setBkColor(::backgroundColor);
-    };
+  //this->onEnter = [&]() {
+  //    setBkColor(::hoverColor);
+  //  };
+  //this->onLeave = [&]() {
+  //  setBkColor(::backgroundColor);
+  //  };
+  //this->onLButtonDown = [&]() {
+  //  setBkColor(::clickDownColor);
+  //  };
+  //this->onLButtonUp = [&]() {
+  //  setBkColor(::backgroundColor);
+  //  };
 
 }
 
@@ -45,5 +45,23 @@ void button::onupdateAnimState(long long delta_time)
   if (hover) {
     
   }
+}
+
+void button::processLButtonDown()
+{
+  control_base::processLButtonDown();
+  setBkColor(::clickDownColor);
+}
+
+void button::processLButtonUp()
+{
+  control_base::processLButtonUp();
+  setBkColor(::backgroundColor);
+}
+
+void button::processLButtonDBLClick()
+{
+  control_base::processLButtonDBLClick();
+
 }
 

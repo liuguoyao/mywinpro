@@ -25,16 +25,17 @@ public:
   std::vector<control_base*> controlsAtPoint(const point& p);
 
   // event process
-  bool processEvent(evt e);
-  void onMouseMove(const point &p);
-  //void onLButtonDown();
-  //void onLButtonUp();
-  //void onLButtonDBLClick();
+  virtual bool processEvent(evt e);
+  virtual void processMouseMove(const point &p);
+  virtual void processLButtonDown();
+  virtual void processLButtonUp();
+  virtual void processLButtonDBLClick();
 
-  void updateState(long long delt_time);
-  void setBkColor(const rgb &rgb );
+  virtual void updateState(long long delt_time);
+  virtual void setBkColor(const rgb &rgb );
 
   //mouse event
+  std::function<void(const point &)> onMouseMove;
   std::function<void()> onEnter;
   std::function<void()> onLeave;
   std::function<void()> onClick;

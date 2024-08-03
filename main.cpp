@@ -28,12 +28,12 @@ int main(int argc,char ** argv) {
   f->resize(60, 30);
   f->setposition(270, 10);
 
-  c->onEnter = [&]()->void {
-    c->setBkColor(::hoverColor);
-    };
-  c->onLeave = [&]()->void {
-    c->setBkColor(::backgroundColor);
-    };
+  //c->onEnter = [&]()->void {
+  //  c->setBkColor(::hoverColor);
+  //  };
+  //c->onLeave = [&]()->void {
+  //  c->setBkColor(::backgroundColor);
+  //  };
   //b->onEnter = [&]()->void {
   //  b->setBkColor(::hoverColor);
   //  };
@@ -42,6 +42,9 @@ int main(int argc,char ** argv) {
   //  };
 
   a.addChild(c);
+  //f->onLButtonDown = []() {
+  //  OutputDebugString(L"button click\n");
+  //  };
 
   return a.run();
 }

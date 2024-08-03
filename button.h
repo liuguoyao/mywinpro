@@ -10,6 +10,9 @@ public:
   button(std::wstring name, control_base* parent=nullptr);
   virtual void onPaint(HDC hdc);
   virtual void onupdateAnimState(long long delta_time) override;
+  virtual void processLButtonDown() override;
+  virtual void processLButtonUp() override;
+  virtual void processLButtonDBLClick() override;
 
 private:
 

@@ -12,6 +12,7 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   with(0),
   parent(parent),
   hover(false),
+  onMouseMove([](const point &) {}),
   onClick([]() {}),
   onDoubleClick([]() {}),
   onEnter([]() {}),
@@ -162,21 +163,21 @@ bool control_base::processEvent(evt e)
   {
   case WM_MOUSEMOVE:
     if(!mouseLeftButtonDown)
-      onMouseMove(point(e.x,e.y));
+      processMouseMove(point(e.x,e.y));
     break;
   case WM_LBUTTONDOWN:
     mouseLeftButtonDown=true;
-    onLButtonDown();
+    processLButtonDown();
     break;
   case WM_LBUTTONUP:
     if (mouseLeftButtonDown)
     {
       mouseLeftButtonDown = false;
-      onLButtonUp();
+      processLButtonUp();
     }
     break;
   case WM_LBUTTONDBLCLK:
-    onLButtonDBLClick();
+    processLButtonDBLClick();
     break;
   default:
     break;
@@ -184,7 +185,7 @@ bool control_base::processEvent(evt e)
   return false;
 }
 
-void control_base::onMouseMove(const point& global_p)
+void control_base::processMouseMove(const point& global_p)
 {
   
   if (containsPoint(global_p))
@@ -206,9 +207,24 @@ void control_base::onMouseMove(const point& global_p)
   }
   for (const auto& c2 : childrens)
   {
-    c2->onMouseMove(global_p);
+    c2->processMouseMove(global_p);
   }
   needupdate = true;
+}
+
+void control_base::processLButtonDown()
+{
+  onLButtonDown();
+}
+
+void control_base::processLButtonUp()
+{
+  onLButtonUp();
+}
+
+void control_base::processLButtonDBLClick()
+{
+  onLButtonDBLClick();
 }
 
 void control_base::updateState(long long delt_time)
