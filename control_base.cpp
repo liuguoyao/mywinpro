@@ -4,6 +4,7 @@
 #include "app.h"
 #include<limits>
 #include <sstream>
+#include <imm.h>
 
 control_base::control_base(const std::wstring &name, control_base* parent) :
   x_relative_parent(0),
@@ -293,6 +294,49 @@ void control_base::onupdateAnimState(long long delt_time)
       deltabackgroundColor = rgb(0,0,0);
     }
     needupdate = true;
+  }
+}
+
+void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch (message)
+  {  //imm
+  case WM_IME_STARTCOMPOSITION: {
+      HIMC hIMC = ImmGetContext(hWnd);
+      if (hIMC) {
+        COMPOSITIONFORM cf;
+        cf.dwStyle = CFS_POINT; // 使用点定位
+        POINT pt = { 100, 100 };
+        cf.ptCurrentPos = pt;   // 设置候选框的位置
+        ImmSetCompositionWindow(hIMC, &cf);
+        ImmReleaseContext(hWnd, hIMC);
+      }
+  }
+  break;
+  case WM_IME_COMPOSITION: {
+    WCHAR szCompStr[256];
+    HIMC hIMC = ImmGetContext(hWnd);
+    memset(szCompStr, 0, sizeof(szCompStr));
+    if (lParam & GCS_COMPSTR) {
+      DWORD dwSize = ImmGetCompositionStringW(hIMC, GCS_COMPSTR, szCompStr, 256);
+    }
+    else if (lParam & GCS_RESULTSTR)
+    {
+      LONG buflen = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
+      ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, szCompStr, buflen);
+    }
+    // 更新文本框显示，处理dwSize字节的输入字符串
+    OutputDebugString(szCompStr);
+    ImmReleaseContext(hWnd, hIMC);
+    InvalidateRect(hWnd, NULL, false);
+    break;
+  }
+  case WM_IME_ENDCOMPOSITION:
+    break;
+
+  default:
+    //DefWindowProc(hWnd, message, wParam, lParam);
+    break;
   }
 }
 

@@ -50,6 +50,8 @@ public:
   virtual void onPaint(HDC hdc);
   virtual void onupdateAnimState(long long delt_time);
 
+  virtual void processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
   void invalidate();
 
   bool operator<(const control_base  &other) const;

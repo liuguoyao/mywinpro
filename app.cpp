@@ -8,6 +8,7 @@
 #include<vector>
 #include <stack>
 #include <chrono>
+#include <imm.h>
 
 std::set<control_base*> app::childrens{};
 long long app::last_update_time = 0;
@@ -179,6 +180,22 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
   }
   break;
+
+  //imm
+  case WM_IME_SETCONTEXT:
+    return DefWindowProc(hWnd, message, wParam, lParam);
+  case WM_IME_STARTCOMPOSITION:
+  case WM_IME_ENDCOMPOSITION:
+  case WM_IME_COMPOSITION:{
+    for (const auto& c : childrens)
+    {
+      c->processIMMEvent(hWnd, message, wParam, lParam);
+    }
+    break;
+  }
+
+
+
   case WM_DESTROY:
     PostQuitMessage(0);
     break;
