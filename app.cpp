@@ -132,7 +132,23 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   {
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hWnd, &ps);
-
+    HFONT hFont = CreateFont(
+      24,              // 字体高度
+      0,               // 字体宽度，0表示默认
+      0,               // 文本旋转角度
+      0,               // 字体倾斜角度
+      FW_NORMAL,       // 字重
+      FALSE,           // 粗体
+      FALSE,           // 下划线
+      FALSE,           // strikeout（删除线）
+      DEFAULT_CHARSET, // 字符集
+      OUT_DEFAULT_PRECIS, // 输出精度
+      CLIP_DEFAULT_PRECIS, // 剪辑精度
+      DEFAULT_QUALITY, // 输出质量
+      DEFAULT_PITCH | FF_DONTCARE, // 间距和字体家族
+      L"JetBrains Mono NL Medium"         // 字体名
+    );
+    
 #define use_double_buffering 
 #ifdef use_double_buffering
     //双缓冲
@@ -146,7 +162,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     FillRect(hdcMem, &rect, hbr);
     DeleteObject(hbr);
 #endif
-
+    auto oldfont = SelectObject(hdcMem, hFont);
     //draw children
     for (const auto& c:childrens)
     {
@@ -165,7 +181,8 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     DeleteDC(hdcMem);
     DeleteObject(hbmMem);
 #endif
-
+    SelectObject(hdc, oldfont);
+    DeleteObject(hFont);
     EndPaint(hWnd, &ps);
   }
   break;
