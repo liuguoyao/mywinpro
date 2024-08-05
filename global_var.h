@@ -18,3 +18,8 @@ extern rgb clickDownColor;
 extern rgb activeColor;
 extern rgb backgroundColor;
 extern rgb fontColor;
+extern rgb focusBorderColor;
+
+//custom vm
+#define WM_MY_SETFOCUS (WM_USER + 1)
+#define WM_MY_KILLFOCUS (WM_USER + 2)

@@ -29,8 +29,8 @@ void button::onPaint(HDC hdc)
   control_base::onPaint(hdc);
 
   point p1(x_relative_parent, y_relative_parent);
-  p1 += globalposition();
-  RECT rect = { p1.x, p1.y, p1.x + with, p1.y + height };
+  p1 += position_in_app();
+  RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
 
   SetTextColor(hdc, RGB(fontColor.r, fontColor.g, fontColor.b));
   //SetBkColor(hdc,  RGB(0, 0, 255));

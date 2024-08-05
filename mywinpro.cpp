@@ -18,6 +18,7 @@ rgb clickDownColor( 0x11, 0x99, 0x9e);
 rgb activeColor(0x30, 0xe3, 0xca);
 rgb backgroundColor(0xf9, 0xf7, 0xf7);
 rgb fontColor(0x40, 0x51, 0x4e);
+rgb focusBorderColor(0x11, 0x99, 0x9e);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,

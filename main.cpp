@@ -13,6 +13,7 @@ int main(int argc,char ** argv) {
   auto d = Ctrls::instance().create_label(L"labeld", c);
   auto e = Ctrls::instance().create_label(L"labele", c);
   auto f = Ctrls::instance().create_button(L"button", c);
+  auto g = Ctrls::instance().create_edit(L"edit", c);
   
   
   c->resize(60, 30);
@@ -27,6 +28,8 @@ int main(int argc,char ** argv) {
   e->setposition(230, 10);
   f->resize(60, 30);
   f->setposition(270, 10);
+  g->resize(260, 30);
+  g->setposition(270, 30);
 
   //c->onEnter = [&]()->void {
   //  c->setBkColor(::hoverColor);

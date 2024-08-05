@@ -186,15 +186,44 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd, message, wParam, lParam);
   case WM_IME_STARTCOMPOSITION:
   case WM_IME_ENDCOMPOSITION:
-  case WM_IME_COMPOSITION:{
+  case WM_IME_COMPOSITION:
+  case WM_CHAR: //keyboard 
+  case WM_KEYDOWN:
+  case WM_KEYUP:
+  case WM_DEADCHAR:
+  case WM_SYSKEYDOWN:
+  case WM_SYSKEYUP:
     for (const auto& c : childrens)
     {
       c->processIMMEvent(hWnd, message, wParam, lParam);
     }
     break;
+
+  //focus
+  case WM_MY_SETFOCUS:{
+    std::stack<control_base*> stack;
+    for (const auto& c : childrens)
+    {
+      stack.emplace(c);
+    }
+
+    while (!stack.empty())
+    {
+      auto item = stack.top();
+      stack.pop();
+      for (const auto& c : item->childrens)
+      {
+        stack.emplace(c);
+      }
+      if (item!=(control_base*)wParam)
+      {
+        item->setFocus(false);
+      }
+    }
   }
-
-
+    break;
+  //case WM_MY_KILLFOCUS:
+  //  break;
 
   case WM_DESTROY:
     PostQuitMessage(0);

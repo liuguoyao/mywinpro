@@ -6,6 +6,7 @@
 #include <functional>
 #include <string>
 #include <set>
+#include <Windows.h>
 
 class control_base
 {
@@ -19,7 +20,7 @@ public:
   void resize(int w,int h);
   void setposition(int x, int y);
   point position();
-  point globalposition();
+  point position_in_app();
   control_base* addChild(control_base *control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
@@ -50,7 +51,13 @@ public:
   virtual void onPaint(HDC hdc);
   virtual void onupdateAnimState(long long delt_time);
 
+  //imm
   virtual void processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+  //foucus
+  virtual bool hasFocus();
+  virtual void setFocus(bool focus);
+
 
   void invalidate();
 
@@ -67,7 +74,7 @@ protected:
 protected:
   int x_relative_parent;
   int y_relative_parent;
-  int with;
+  int width;
   int height;
   
   control_base* parent;
@@ -102,6 +109,10 @@ protected:
   bool mouseRightButtonUp;
   bool mouseLeftButtonClick;
 
+  //focus
+  bool _hasFocus;
+  std::wstring _comtext;
+  std::wstring _context;
 
 private:
   bool needupdate;

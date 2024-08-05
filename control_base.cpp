@@ -5,12 +5,14 @@
 #include<limits>
 #include <sstream>
 #include <imm.h>
+#include <cwctype>
+
 
 control_base::control_base(const std::wstring &name, control_base* parent) :
   x_relative_parent(0),
   y_relative_parent(0),
   height(0),
-  with(0),
+  width(0),
   parent(parent),
   hover(false),
   onMouseMove([](const point &) {}),
@@ -43,13 +45,13 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   mouseRightButtonDown(false),
   mouseLeftButtonUp(false),
   mouseRightButtonUp(false),
-  mouseLeftButtonClick(false)
+  mouseLeftButtonClick(false),
+  _hasFocus(false)
 {
   if (nullptr != parent)
   {
     parent->addChild(this);
   }
-  
 }
 
 control_base::~control_base()
@@ -71,7 +73,7 @@ void control_base::paint(HDC hdc)
 
 void control_base::resize(int w, int h)
 {
-  with = w;
+  width = w;
   height = h;
 }
 
@@ -86,7 +88,7 @@ point control_base::position()
   return point(x_relative_parent, y_relative_parent);
 }
 
-point control_base::globalposition()
+point control_base::position_in_app()
 {
   control_base* cur_p = parent;
   point curp = position();
@@ -114,8 +116,8 @@ control_base* control_base::addChild(control_base* control)
 bool control_base::containsPoint(const point& p)
 {
   point p1(x_relative_parent, y_relative_parent);
-  point p2(with + x_relative_parent, height + y_relative_parent);
-  point relativep = globalposition();
+  point p2(width + x_relative_parent, height + y_relative_parent);
+  point relativep = position_in_app();
   p1 += relativep;
   p2 += relativep;
   if (p.x<p2.x && p.x>p1.x && p.y>p1.y && p.y<p2.y)
@@ -227,6 +229,8 @@ void control_base::processMouseLeave()
 
 void control_base::processLButtonDown()
 {
+  setFocus(true);
+  PostMessage(APP.hWnd, WM_MY_SETFOCUS, (WPARAM)this, 0);
   onLButtonDown();
 }
 
@@ -261,12 +265,21 @@ void control_base::setBkColor(const rgb& bkcolor)
 void control_base::onPaint(HDC hdc)
 {
   point p1(x_relative_parent, y_relative_parent);
-  point p2(with + x_relative_parent, height + y_relative_parent);
-  point relativep = globalposition();
+  point p2(width + x_relative_parent, height + y_relative_parent);
+  point relativep = position_in_app();
   p1 += relativep;
   p2 += relativep;
 
-  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+  HPEN hPen; 
+  if (hasFocus())
+  {
+    hPen = CreatePen(PS_SOLID, 1, RGB(focusBorderColor.r, focusBorderColor.g, focusBorderColor.b));
+  }
+  else
+  {
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+  }
+  
   rgb color;
   HBRUSH hBrush = CreateSolidBrush(RGB(curbackgroundColor.r, curbackgroundColor.g, curbackgroundColor.b));
   HGDIOBJ oldPen = SelectObject(hdc, hPen);
@@ -299,45 +312,86 @@ void control_base::onupdateAnimState(long long delt_time)
 
 void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  switch (message)
-  {  //imm
-  case WM_IME_STARTCOMPOSITION: {
+  if (hasFocus())
+  {
+    switch (message)
+    {  //imm
+    case WM_CHAR:
+      if (wParam == VK_BACK) {
+        if(_context.length()>0) _context.erase(_context.length() - 1);
+        break;
+      }else if (wParam == VK_ESCAPE) {
+        _context.clear();
+        break;
+      }
+      else if(std::iswprint(wParam))
+      {
+        _context += (WCHAR)wParam;
+      }
+      else
+      {
+
+      }
+      break;
+    case WM_IME_STARTCOMPOSITION: {
+      if (!hasFocus()) break;
       HIMC hIMC = ImmGetContext(hWnd);
       if (hIMC) {
         COMPOSITIONFORM cf;
         cf.dwStyle = CFS_POINT; // 使用点定位
-        POINT pt = { 100, 100 };
+        POINT pt = { position_in_app().x * 2, position_in_app().y + height };
         cf.ptCurrentPos = pt;   // 设置候选框的位置
         ImmSetCompositionWindow(hIMC, &cf);
+
         ImmReleaseContext(hWnd, hIMC);
       }
-  }
-  break;
-  case WM_IME_COMPOSITION: {
-    WCHAR szCompStr[256];
-    HIMC hIMC = ImmGetContext(hWnd);
-    memset(szCompStr, 0, sizeof(szCompStr));
-    if (lParam & GCS_COMPSTR) {
-      DWORD dwSize = ImmGetCompositionStringW(hIMC, GCS_COMPSTR, szCompStr, 256);
     }
-    else if (lParam & GCS_RESULTSTR)
-    {
-      LONG buflen = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
-      ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, szCompStr, buflen);
+      break;
+    case WM_IME_COMPOSITION: {
+      if (!hasFocus()) break;
+      WCHAR szCompStr[256];
+      HIMC hIMC = ImmGetContext(hWnd);
+      memset(szCompStr, 0, sizeof(szCompStr));
+      if (lParam & GCS_COMPSTR) {
+        DWORD dwSize = ImmGetCompositionStringW(hIMC, GCS_COMPSTR, szCompStr, 256);
+        _comtext = szCompStr;
+      }
+      else if (lParam & GCS_RESULTSTR)
+      {
+        LONG buflen = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
+        ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, szCompStr, buflen);
+        _comtext = L"";
+        _context += szCompStr;
+      }
+      // 更新文本框显示，处理dwSize字节的输入字符串
+      OutputDebugString(szCompStr);
+      ImmReleaseContext(hWnd, hIMC);
+      InvalidateRect(hWnd, NULL, false);
+      break;
     }
-    // 更新文本框显示，处理dwSize字节的输入字符串
-    OutputDebugString(szCompStr);
-    ImmReleaseContext(hWnd, hIMC);
-    InvalidateRect(hWnd, NULL, false);
-    break;
-  }
-  case WM_IME_ENDCOMPOSITION:
-    break;
+    case WM_IME_ENDCOMPOSITION:
+      break;
 
-  default:
-    //DefWindowProc(hWnd, message, wParam, lParam);
-    break;
+    default:
+      //DefWindowProc(hWnd, message, wParam, lParam);
+      break;
+    }
   }
+
+  for (auto c:childrens)
+  {
+    c->processIMMEvent(hWnd,  message,  wParam,  lParam);
+  }
+}
+
+bool control_base::hasFocus()
+{
+  return _hasFocus;
+}
+
+void control_base::setFocus(bool focus)
+{
+  _hasFocus = focus;
 }
 
 
@@ -355,7 +409,7 @@ void control_base::invalidate()
 RECT control_base::rect_global()
 {
   point p1(x_relative_parent, y_relative_parent);
-  p1 += globalposition();
-  RECT rect = { p1.x, p1.y, p1.x + with, p1.y + height };
+  p1 += position_in_app();
+  RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
   return rect;
 }
