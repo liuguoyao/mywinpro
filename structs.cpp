@@ -105,12 +105,12 @@ rgb&& rgb::operator+(const rgb& other)
   return std::move(rgb(r+other.r, g + other.g, b + other.b));
 }
 
-rgb&& rgb::operator*(const int num)
+rgb&& rgb::operator*(const double num)
 {
   return std::move(rgb(r * num, g * num, b * num));
 }
 
-rgb&& rgb::operator/(const int num)
+rgb&& rgb::operator/(const double num)
 {
   return std::move(rgb(r / num, g / num, b / num));
 }

@@ -5,6 +5,8 @@
 #include "label.h"
 #include "button.h"
 #include "edit.h"
+#include "layout.h"
+#include "hlayout.h"
 #include <map>
 #include <memory>
 
@@ -17,6 +19,7 @@ public:
 	label* create_label(std::wstring name,control_base* parent = nullptr);
 	button* create_button(std::wstring name,control_base* parent = nullptr);
 	edit* create_edit(std::wstring name,control_base* parent = nullptr);
+	hlayout* create_hlayout(std::wstring name,control_base* parent = nullptr);
 private:
 	Ctrls();
 	std::map<std::wstring, std::unique_ptr<control_base>> m_controls;

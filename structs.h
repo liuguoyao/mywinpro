@@ -15,6 +15,7 @@ public:
   point operator + (point &a);
   point& operator += (point a);
 };
+using size = point;
 
 class rgb
 {
@@ -27,8 +28,8 @@ public:
   rgb& operator=( rgb&& other);
   rgb&& operator-(const rgb& other);
   rgb&& operator+(const rgb& other);
-  rgb&& operator*(const int num);
-  rgb&& operator/(const int num);
+  rgb&& operator*(const double num);
+  rgb&& operator/(const double num);
   rgb& operator+=(const rgb& other);
   double abs();
   
@@ -47,6 +48,14 @@ public:
   int y;
   int type;
   int button;
+};
+
+struct sizePolicy
+{
+  int xPolicy;
+  int yPolicy;
+  int xFactor;
+  int yFactor;
 };
 
 #endif

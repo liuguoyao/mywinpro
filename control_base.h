@@ -3,6 +3,7 @@
 #include "framework.h"
 #include <vector>
 #include "structs.h"
+#include "global_var.h"
 #include <functional>
 #include <string>
 #include <set>
@@ -15,13 +16,16 @@ public:
   control_base() {};
   control_base(const std::wstring &name, control_base* parent = nullptr) ;
   virtual ~control_base();
+  virtual std::wstring classtype() const;
   void paint(HDC hdc);
 
   void resize(int w,int h);
+  void resize(size s);
+  size getSize();
   void setposition(int x, int y);
   point position();
   point position_in_app();
-  control_base* addChild(control_base *control);
+  virtual control_base* addChild(control_base *control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
 
@@ -58,6 +62,9 @@ public:
   virtual bool hasFocus();
   virtual void setFocus(bool focus);
 
+  // layout
+  virtual void placeChildren() {};
+  sizePolicy getSizePolicy() const;
 
   void invalidate();
 
@@ -113,6 +120,9 @@ protected:
   bool _hasFocus;
   std::wstring _comtext;
   std::wstring _context;
+
+  //sizePolicy
+  sizePolicy _sizePolicy;
 
 private:
   bool needupdate;

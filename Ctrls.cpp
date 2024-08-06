@@ -34,6 +34,16 @@ edit* Ctrls::create_edit(std::wstring name, control_base* parent)
   return (edit*)m_controls[name].get();
 }
 
+
+hlayout* Ctrls::create_hlayout(std::wstring name, control_base* parent)
+{
+  if (m_controls.find(name) == m_controls.end()) {
+    m_controls[name] = std::move(std::make_unique<hlayout>(name, parent));
+  }
+
+  return (hlayout*)m_controls[name].get();
+}
+
 control_base* Ctrls::create_base(std::wstring name, control_base* parent)
 {
   if (m_controls.find(name) == m_controls.end()) {

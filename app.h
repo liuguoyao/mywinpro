@@ -18,9 +18,12 @@ class app
 
      int run();
      control_base* addChild(control_base* control);
+     control_base* addLayout(layout* layout);
      void Invalidate();
      std::vector<control_base*> controlsAtPoint(const point &p);
      control_base* findControlByName(const std::wstring& name);
+     size getSize() const;
+     static void onSizeChanged(size newSize);
 
 private:
   app();

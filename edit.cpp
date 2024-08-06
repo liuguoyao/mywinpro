@@ -3,6 +3,7 @@
 edit::edit(std::wstring name, control_base* parent)
   :control_base(name, parent), _time_acc(0), _draw_text_cursor(true)
 {
+  _sizePolicy.xPolicy = SIZEPOLICY_EXPAND;
 }
 
 void edit::onPaint(HDC hdc)
@@ -11,7 +12,7 @@ void edit::onPaint(HDC hdc)
 
   std::wstring text = _context+_comtext;
   SIZE text_size = { 0, 0 };
-  GetTextExtentPoint32(hdc, text.c_str(), text.length(), &text_size);
+  GetTextExtentPoint32(hdc, text.c_str(), (int)text.length(), &text_size);
 
   point p1(x_relative_parent, y_relative_parent);
   p1 += position_in_app();
@@ -31,7 +32,7 @@ void edit::onPaint(HDC hdc)
 void edit::onupdateAnimState(long long delta_time)
 {
   control_base::onupdateAnimState(delta_time);
-  _time_acc+=delta_time;
+  _time_acc+=(unsigned short)delta_time;
   if(_time_acc>500)
   {
     _draw_text_cursor = !_draw_text_cursor;

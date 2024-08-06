@@ -80,6 +80,12 @@ control_base* app::addChild(control_base* control)
   return nullptr;
 }
 
+control_base* app::addLayout(layout* layout)
+{
+  layout->resize(getSize());
+  return addChild(layout);
+}
+
 void app::Invalidate()
 {
   InvalidateRect(hWnd, NULL, FALSE);
@@ -104,6 +110,14 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
+  case WM_SIZE:
+  {
+    int width = LOWORD(lParam);
+    int height = HIWORD(lParam);
+    onSizeChanged(size(width,height));
+    //return DefWindowProc(hWnd, message, wParam, lParam);
+    break;
+  }
   case WM_LBUTTONUP:
   case WM_LBUTTONDOWN:
   case WM_LBUTTONDBLCLK:
@@ -133,7 +147,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hWnd, &ps);
     HFONT hFont = CreateFont(
-      24,              // 字体高度
+      20,              // 字体高度
       0,               // 字体宽度，0表示默认
       0,               // 文本旋转角度
       0,               // 字体倾斜角度
@@ -144,7 +158,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       DEFAULT_CHARSET, // 字符集
       OUT_DEFAULT_PRECIS, // 输出精度
       CLIP_DEFAULT_PRECIS, // 剪辑精度
-      DEFAULT_QUALITY, // 输出质量
+      CLEARTYPE_QUALITY, // 输出质量
       DEFAULT_PITCH | FF_DONTCARE, // 间距和字体家族
       L"JetBrains Mono NL Medium"         // 字体名
     );
@@ -161,8 +175,11 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HBRUSH hbr = CreateSolidBrush(RGB(255, 255, 255)); // 白色背景  
     FillRect(hdcMem, &rect, hbr);
     DeleteObject(hbr);
-#endif
     auto oldfont = SelectObject(hdcMem, hFont);
+#else
+    auto oldfont = SelectObject(hdc, hFont);
+#endif
+    
     //draw children
     for (const auto& c:childrens)
     {
@@ -276,4 +293,21 @@ control_base* app::findControlByName(const std::wstring& name)
   }
   MessageBox(NULL, (L"has no control name "+name).c_str(), L"错误", MB_ICONERROR);
   return nullptr;
+}
+
+size app::getSize() const
+{
+  RECT rect;
+  GetWindowRect(hWnd, &rect);
+  return size(rect.right - rect.left, rect.bottom - rect.top);
+}
+
+void app::onSizeChanged(size newSize)
+{
+  for (auto c : childrens )
+  {
+    if (L"hlayout"==c->classtype()) {
+      c->resize(newSize);
+    }
+  }
 }

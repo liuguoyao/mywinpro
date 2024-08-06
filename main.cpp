@@ -8,28 +8,22 @@
 int main(int argc,char ** argv) {
   app& a = app::getInstance();
 
-  auto c = Ctrls::instance().create_label(L"c", nullptr);
-  auto b = Ctrls::instance().create_base(L"label", c);
-  auto d = Ctrls::instance().create_label(L"labeld", c);
-  auto e = Ctrls::instance().create_label(L"labele", c);
-  auto f = Ctrls::instance().create_button(L"button", c);
-  auto g = Ctrls::instance().create_edit(L"edit", c);
+  auto l = Ctrls::instance().create_hlayout(L"hlayout", nullptr);
+  auto c = Ctrls::instance().create_label(L"c", l);
+  auto b = Ctrls::instance().create_base(L"label", l);
+  auto d = Ctrls::instance().create_label(L"labeld", l);
+  auto e = Ctrls::instance().create_label(L"labele", l);
+  auto f = Ctrls::instance().create_button(L"button", l);
+  auto g = Ctrls::instance().create_edit(L"edit", l);
+  auto h = Ctrls::instance().create_edit(L"edit1", l);
   
-  
-  c->resize(60, 30);
-  c->setposition(10, 10);
-
+  c->resize(260, 30);
   b->resize(60, 30);
-  b->setposition(50, 10);
-
   d->resize(60, 30);
-  d->setposition(90, 10);
   e->resize(60, 30);
-  e->setposition(230, 10);
   f->resize(60, 30);
-  f->setposition(270, 10);
   g->resize(260, 30);
-  g->setposition(270, 30);
+  h->resize(60, 30);
 
   //c->onEnter = [&]()->void {
   //  c->setBkColor(::hoverColor);
@@ -44,10 +38,7 @@ int main(int argc,char ** argv) {
   //  b->setBkColor(::backgroundColor);
   //  };
 
-  a.addChild(c);
-  //f->onLButtonDown = []() {
-  //  OutputDebugString(L"button click\n");
-  //  };
+  a.addLayout(l);
 
   return a.run();
 }

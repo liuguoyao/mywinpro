@@ -46,7 +46,8 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   mouseLeftButtonUp(false),
   mouseRightButtonUp(false),
   mouseLeftButtonClick(false),
-  _hasFocus(false)
+  _hasFocus(false),
+  _sizePolicy{SIZEPOLICY_FIXED,SIZEPOLICY_FIXED,0,0}
 {
   if (nullptr != parent)
   {
@@ -58,6 +59,11 @@ control_base::~control_base()
 {
   std::wostringstream o;
   o << "~ " << this << " " << this->x_relative_parent << "\n";
+}
+
+std::wstring control_base::classtype() const
+{
+    return L"control_base";
 }
 
 void control_base::paint(HDC hdc)
@@ -75,6 +81,22 @@ void control_base::resize(int w, int h)
 {
   width = w;
   height = h;
+  control_base* curp = parent;
+  //while (nullptr != curp) {
+  //  parent->placeChildren(); //for layout
+  //  curp = curp->parent;
+  //}
+}
+
+void control_base::resize(size s)
+{
+  resize(s.x, s.y);
+  placeChildren();
+}
+
+size control_base::getSize()
+{
+    return size(width,height);
 }
 
 void control_base::setposition(int x, int y)
@@ -324,7 +346,7 @@ void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARA
         _context.clear();
         break;
       }
-      else if(std::iswprint(wParam))
+      else if(std::iswprint((unsigned short)wParam))
       {
         _context += (WCHAR)wParam;
       }
@@ -398,6 +420,11 @@ void control_base::setFocus(bool focus)
 bool control_base::operator<(const control_base &other) const
 {
   return this->name<other.name;
+}
+
+sizePolicy control_base::getSizePolicy() const
+{
+  return _sizePolicy;
 }
 
 void control_base::invalidate()

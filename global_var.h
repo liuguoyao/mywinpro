@@ -20,6 +20,11 @@ extern rgb backgroundColor;
 extern rgb fontColor;
 extern rgb focusBorderColor;
 
+//sizepolicy
+#define SIZEPOLICY_FIXED 0
+#define SIZEPOLICY_EXPAND 1
+
+
 //custom vm
 #define WM_MY_SETFOCUS (WM_USER + 1)
 #define WM_MY_KILLFOCUS (WM_USER + 2)
