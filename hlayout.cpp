@@ -37,14 +37,14 @@ bool hlayout::processEvent(evt e)
 
 void hlayout::placeChildren()
 {
-  int margin = 2;
-  auto layout_width = getSize().x;
+  float margin = 2;
+  float layout_width = getSize().x;
   if (0 == layout_width) return;
 
-  int curx = margin;
-  int cury = margin;
-  int acc_width_fixed = 0;
-  int acc_width_factor = 0;
+  float curx = margin;
+  float cury = margin;
+  float acc_width_fixed = 0;
+  float acc_width_factor = 0;
   int cnt_expend_children = 0;
   for (auto c : childrens)
   {
@@ -59,32 +59,28 @@ void hlayout::placeChildren()
       acc_width_factor+= policy.xFactor;
     }
   }
-  int width_expend_children = layout_width/2 - acc_width_fixed/2 - margin * (childrens.size()+1);
-  //width_expend_children /= 2;
+  float width_expend_children = layout_width - acc_width_fixed - margin * (childrens.size()+1);
   for (auto c : childrens)
   {
     c->setposition(curx, cury);
     if (SIZEPOLICY_FIXED == c->getSizePolicy().xPolicy)
     {
-      curx += (c->getSize().x / 2 + margin);
+      curx += (c->getSize().x + margin);
     }
     else if (SIZEPOLICY_EXPAND == c->getSizePolicy().xPolicy)
     {
-      int w =0;
+      float w =0;
       if (0 == acc_width_factor)
       {
         w= width_expend_children / cnt_expend_children ;
-        curx += w + margin;
-        
       }
       else
       {
         w = width_expend_children * c->getSizePolicy().xFactor / acc_width_factor;
-        curx += w + margin;
       }
-      c->resize(w*2, c->getSize().y);
+      curx += w + margin;
+      c->resize(w, c->getSize().y);
     }
     
   }
-
 }

@@ -9,15 +9,17 @@ int main(int argc,char ** argv) {
   app& a = app::getInstance();
 
   auto l = Ctrls::instance().create_hlayout(L"hlayout", nullptr);
-  auto c = Ctrls::instance().create_label(L"c", l);
-  auto b = Ctrls::instance().create_base(L"label", l);
-  auto d = Ctrls::instance().create_label(L"labeld", l);
-  auto e = Ctrls::instance().create_label(L"labele", l);
-  auto f = Ctrls::instance().create_button(L"button", l);
-  auto g = Ctrls::instance().create_edit(L"edit", l);
-  auto h = Ctrls::instance().create_edit(L"edit1", l);
-  
-  c->resize(260, 30);
+  auto parent = l;
+  auto c = Ctrls::instance().create_label(L"c", parent);
+  //control_base* parent = c;
+  auto b = Ctrls::instance().create_base(L"label", parent);
+  auto d = Ctrls::instance().create_label(L"labeld", parent);
+  auto e = Ctrls::instance().create_label(L"labele", parent);
+  auto f = Ctrls::instance().create_button(L"button", parent);
+  auto g = Ctrls::instance().create_edit(L"edit", parent);
+  auto h = Ctrls::instance().create_edit(L"edit1", parent);
+
+  c->resize(30, 30);
   b->resize(60, 30);
   d->resize(60, 30);
   e->resize(60, 30);
@@ -38,7 +40,8 @@ int main(int argc,char ** argv) {
   //  b->setBkColor(::backgroundColor);
   //  };
 
-  a.addLayout(l);
+  //a.addChild(parent);
+  a.addLayout(parent);
 
   return a.run();
 }

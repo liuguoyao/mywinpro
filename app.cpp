@@ -83,6 +83,7 @@ control_base* app::addChild(control_base* control)
 control_base* app::addLayout(layout* layout)
 {
   layout->resize(getSize());
+  layout->placeChildren();
   return addChild(layout);
 }
 
@@ -115,6 +116,7 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     int width = LOWORD(lParam);
     int height = HIWORD(lParam);
     onSizeChanged(size(width,height));
+    OutputDebugString((L"wh:" + std::to_wstring(width) + L" " + std::to_wstring(height) + L" \n").c_str());
     //return DefWindowProc(hWnd, message, wParam, lParam);
     break;
   }
@@ -308,6 +310,7 @@ void app::onSizeChanged(size newSize)
   {
     if (L"hlayout"==c->classtype()) {
       c->resize(newSize);
+      c->placeChildren();
     }
   }
 }

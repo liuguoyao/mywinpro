@@ -81,17 +81,11 @@ void control_base::resize(int w, int h)
 {
   width = w;
   height = h;
-  control_base* curp = parent;
-  //while (nullptr != curp) {
-  //  parent->placeChildren(); //for layout
-  //  curp = curp->parent;
-  //}
 }
 
 void control_base::resize(size s)
 {
   resize(s.x, s.y);
-  placeChildren();
 }
 
 size control_base::getSize()
@@ -113,7 +107,7 @@ point control_base::position()
 point control_base::position_in_app()
 {
   control_base* cur_p = parent;
-  point curp = position();
+  point curp = {0,0};
   while (nullptr!=cur_p)
   {
     curp += cur_p->position();
