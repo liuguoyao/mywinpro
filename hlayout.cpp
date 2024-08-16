@@ -1,4 +1,5 @@
 #include "hlayout.h"
+#include "app.h"
 
 hlayout::hlayout()
 {
@@ -37,6 +38,13 @@ bool hlayout::processEvent(evt e)
 
 void hlayout::placeChildren()
 {
+  if (nullptr == parent) {
+    resize(APP.getSize());
+  }
+  else {
+    resize(parent->getSize());
+  }
+  
   float margin = 2;
   float layout_width = (float)getSize().x;
   if (0 == layout_width) return;

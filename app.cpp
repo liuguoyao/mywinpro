@@ -53,6 +53,7 @@ app& app::getInstance()
 int app::run()
 {
   MSG msg;
+  onSizeChanged(getSize());
   Invalidate();
   // 主消息循环:
   while (GetMessage(&msg, nullptr, 0, 0))
@@ -82,8 +83,6 @@ control_base* app::addChild(control_base* control)
 
 control_base* app::addLayout(layout* layout)
 {
-  layout->resize(getSize());
-  layout->placeChildren();
   return addChild(layout);
 }
 
@@ -306,11 +305,25 @@ size app::getSize() const
 
 void app::onSizeChanged(size newSize)
 {
-  for (auto c : childrens )
+  std::stack<control_base*> stack;
+  for (auto c : childrens)
   {
+    if (L"hlayout" == c->classtype() || L"vlayout" == c->classtype()) {
+      stack.push(c);
+    }
+  }
+  while(!stack.empty())
+  {
+    auto c = stack.top();
+    stack.pop();
     if (L"hlayout"==c->classtype()|| L"vlayout" == c->classtype()) {
-      c->resize(newSize);
       c->placeChildren();
+      for (auto cc : c->childrens)
+      {
+        if (L"hlayout" == c->classtype() || L"vlayout" == c->classtype()) {
+          stack.push(cc);
+        }
+      }
     }
   }
 }

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _H_APP_
+#define _H_APP_
+
 #include "framework.h"
 #include "control_base.h"
 #include <vector>
@@ -38,3 +40,5 @@ private:
   static long long last_update_time;
   static std::set<control_base*> childrens;
 };
+
+#endif // !

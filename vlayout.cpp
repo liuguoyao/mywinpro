@@ -1,4 +1,5 @@
 #include "vlayout.h"
+#include "app.h"
 
 vlayout::vlayout()
 {
@@ -37,6 +38,13 @@ bool vlayout::processEvent(evt e)
 
 void vlayout::placeChildren()
 {
+  if (nullptr == parent) {
+    resize(APP.getSize());
+  }
+  else {
+    resize(parent->getSize());
+  }
+
   float margin = 2;
   float layout_height = (float)getSize().y;
 
