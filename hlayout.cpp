@@ -38,7 +38,7 @@ bool hlayout::processEvent(evt e)
 void hlayout::placeChildren()
 {
   float margin = 2;
-  float layout_width = getSize().x;
+  float layout_width = (float)getSize().x;
   if (0 == layout_width) return;
 
   float curx = margin;
@@ -62,7 +62,7 @@ void hlayout::placeChildren()
   float width_expend_children = layout_width - acc_width_fixed - margin * (childrens.size()+1);
   for (auto c : childrens)
   {
-    c->setposition(curx, cury);
+    c->setposition((int)curx, (int)cury);
     if (SIZEPOLICY_FIXED == c->getSizePolicy().xPolicy)
     {
       curx += (c->getSize().x + margin);
@@ -79,7 +79,7 @@ void hlayout::placeChildren()
         w = width_expend_children * c->getSizePolicy().xFactor / acc_width_factor;
       }
       curx += w + margin;
-      c->resize(w, c->getSize().y);
+      c->resize((int)w, c->getSize().y);
     }
     
   }

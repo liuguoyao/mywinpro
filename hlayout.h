@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _H_HLAYOUT_
+#define _H_HLAYOUT_
+
 #include "layout.h"
 class hlayout :
     public layout
@@ -12,4 +14,6 @@ public:
     virtual bool processEvent(evt e);
     virtual void placeChildren() override;
 };
+
+#endif
 

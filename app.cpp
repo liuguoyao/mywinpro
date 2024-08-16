@@ -308,7 +308,7 @@ void app::onSizeChanged(size newSize)
 {
   for (auto c : childrens )
   {
-    if (L"hlayout"==c->classtype()) {
+    if (L"hlayout"==c->classtype()|| L"vlayout" == c->classtype()) {
       c->resize(newSize);
       c->placeChildren();
     }
