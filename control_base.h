@@ -65,6 +65,11 @@ public:
   // layout
   virtual void placeChildren() {};
   sizePolicy getSizePolicy() const;
+  void setSizePolicy(sizePolicy &sp);
+  void setxPolicy(int xPolicy);
+  void setyPolicy(int yPolicy);
+  void setxFactor(int xFactor);
+  void setyFactor(int yFactor);
 
   void invalidate();
 

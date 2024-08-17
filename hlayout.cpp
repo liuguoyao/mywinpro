@@ -22,7 +22,6 @@ std::wstring hlayout::classtype() const
 control_base* hlayout::addChild(control_base* control)
 {
   auto r = control_base::addChild(control);
-  placeChildren();
   return r;
 }
 
@@ -42,7 +41,8 @@ void hlayout::placeChildren()
     resize(APP.getSize());
   }
   else {
-    resize(parent->getSize());
+    //resize(parent->getSize());
+    resize(parent->getSize().x,height);
   }
   
   float margin = 2;
@@ -65,6 +65,9 @@ void hlayout::placeChildren()
     {
       cnt_expend_children += 1;
       acc_width_factor+= policy.xFactor;
+    }
+    if (SIZEPOLICY_EXPAND == policy.yPolicy) {
+      c->resize(c->getSize().x, getSize().y - 2 * margin);
     }
   }
   float width_expend_children = layout_width - acc_width_fixed - margin * (childrens.size()+1);

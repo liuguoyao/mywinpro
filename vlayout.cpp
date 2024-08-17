@@ -22,7 +22,6 @@ std::wstring vlayout::classtype() const
 control_base* vlayout::addChild(control_base* control)
 {
   auto r = control_base::addChild(control);
-  placeChildren();
   return r;
 }
 
@@ -42,7 +41,7 @@ void vlayout::placeChildren()
     resize(APP.getSize());
   }
   else {
-    resize(parent->getSize());
+    resize(width, parent->getSize().y);
   }
 
   float margin = 2;
@@ -52,7 +51,7 @@ void vlayout::placeChildren()
 
   float curx = margin;
   float cury = margin;
-  float acc_height_fixed = 0;
+  float acc_height_fixed = margin;
   float acc_height_factor = 0;
   int cnt_expend_children = 0;
   for (auto c : childrens)
@@ -60,15 +59,18 @@ void vlayout::placeChildren()
     auto policy = c->getSizePolicy();
     if (SIZEPOLICY_FIXED == policy.yPolicy)
     {
-      acc_height_fixed += c->getSize().y;
+      acc_height_fixed += c->getSize().y+ margin;
     }
     else if (SIZEPOLICY_EXPAND == policy.yPolicy)
     {
       cnt_expend_children += 1;
       acc_height_factor += policy.yFactor;
     }
+    if (SIZEPOLICY_EXPAND == policy.xPolicy) {
+      c->resize(getSize().x - 2 * margin, c->getSize().y);
+    }
   }
-  float height_expend_children = layout_height - acc_height_fixed - margin * (childrens.size() + 1);
+  float height_expend_children = layout_height - acc_height_fixed - margin*(cnt_expend_children+1);
   for (auto c : childrens)
   {
     c->setposition((int)curx, (int)cury);

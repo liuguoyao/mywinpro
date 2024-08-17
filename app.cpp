@@ -299,7 +299,7 @@ control_base* app::findControlByName(const std::wstring& name)
 size app::getSize() const
 {
   RECT rect;
-  GetWindowRect(hWnd, &rect);
+  GetClientRect(hWnd, &rect);
   return size(rect.right - rect.left, rect.bottom - rect.top);
 }
 

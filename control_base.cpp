@@ -11,8 +11,8 @@
 control_base::control_base(const std::wstring &name, control_base* parent) :
   x_relative_parent(0),
   y_relative_parent(0),
-  height(0),
-  width(0),
+  height(30),
+  width(60),
   parent(parent),
   hover(false),
   onMouseMove([](const point &) {}),
@@ -419,6 +419,31 @@ bool control_base::operator<(const control_base &other) const
 sizePolicy control_base::getSizePolicy() const
 {
   return _sizePolicy;
+}
+
+void control_base::setSizePolicy(sizePolicy& sp)
+{
+    _sizePolicy = sp;
+}
+
+void control_base::setxPolicy(int xPolicy)
+{
+  _sizePolicy.xPolicy = xPolicy;
+}
+
+void control_base::setyPolicy(int yPolicy)
+{
+  _sizePolicy.yPolicy = yPolicy;
+}
+
+void control_base::setxFactor(int xFactor)
+{
+  _sizePolicy.xFactor = xFactor;
+}
+
+void control_base::setyFactor(int yFactor)
+{
+  _sizePolicy.yFactor = yFactor;
 }
 
 void control_base::invalidate()
