@@ -51,6 +51,18 @@ point& point::operator+=(point a)
   return *this;
 }
 
+point point::operator-(point& a)
+{
+  return point(-a.x + x, -a.y + y);
+}
+
+point& point::operator-=(point a)
+{
+  x -= a.x;
+  y -= a.y;
+  return *this;
+}
+
 rgb::rgb():r(255), g(255), b(255)
 {
 

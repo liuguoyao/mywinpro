@@ -47,7 +47,8 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   mouseRightButtonUp(false),
   mouseLeftButtonClick(false),
   _hasFocus(false),
-  _sizePolicy{SIZEPOLICY_FIXED,SIZEPOLICY_FIXED,0,0}
+  _sizePolicy{SIZEPOLICY_FIXED,SIZEPOLICY_FIXED,0,0},
+  _pos_text_cursor(0.0)
 {
   if (nullptr != parent)
   {
@@ -161,6 +162,34 @@ std::vector<control_base*> control_base::controlsAtPoint(const point& p)
   }
 
   return ret;
+}
+
+float control_base::text_width(HWND hWnd, std::wstring text)
+{
+  SIZE text_size = { 0, 0 };
+  HDC hdc = GetDC(hWnd);
+  HFONT hFont = CreateFont(
+    20,              // 字体高度
+    0,               // 字体宽度，0表示默认
+    0,               // 文本旋转角度
+    0,               // 字体倾斜角度
+    FW_NORMAL,       // 字重
+    FALSE,           // 粗体
+    FALSE,           // 下划线
+    FALSE,           // strikeout（删除线）
+    DEFAULT_CHARSET, // 字符集
+    OUT_DEFAULT_PRECIS, // 输出精度
+    CLIP_DEFAULT_PRECIS, // 剪辑精度
+    CLEARTYPE_QUALITY, // 输出质量
+    DEFAULT_PITCH | FF_DONTCARE, // 间距和字体家族
+    L"JetBrains Mono NL Medium"         // 字体名
+  );
+  auto oldfont = SelectObject(hdc, hFont);
+  GetTextExtentPoint32(hdc, text.c_str(), (int)text.length(), &text_size);
+  SelectObject(hdc, oldfont);
+  DeleteObject(hFont);
+  ReleaseDC(hWnd, hdc);
+  return (float)text_size.cx;
 }
 
 bool control_base::processEvent(evt e)
@@ -335,14 +364,17 @@ void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARA
     case WM_CHAR:
       if (wParam == VK_BACK) {
         if(_context.length()>0) _context.erase(_context.length() - 1);
+        _pos_text_cursor = text_width(hWnd, _context + _comtext);
         break;
       }else if (wParam == VK_ESCAPE) {
         _context.clear();
+        _pos_text_cursor = 1;
         break;
       }
       else if(std::iswprint((unsigned short)wParam))
       {
         _context += (WCHAR)wParam;
+        _pos_text_cursor = text_width(hWnd, _context + _comtext);
       }
       else
       {
@@ -379,6 +411,8 @@ void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARA
         _comtext = L"";
         _context += szCompStr;
       }
+      _pos_text_cursor = text_width(hWnd, _context + _comtext);
+
       // 更新文本框显示，处理dwSize字节的输入字符串
       OutputDebugString(szCompStr);
       ImmReleaseContext(hWnd, hIMC);

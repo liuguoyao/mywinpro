@@ -28,6 +28,7 @@ public:
   virtual control_base* addChild(control_base *control);
   bool containsPoint(const point &p);
   std::vector<control_base*> controlsAtPoint(const point& p);
+  float text_width(HWND hWnd, std::wstring text);
 
   // event process
   virtual bool processEvent(evt e);
@@ -128,6 +129,7 @@ protected:
 
   //sizePolicy
   sizePolicy _sizePolicy;
+  float _pos_text_cursor;
 
 private:
   bool needupdate;

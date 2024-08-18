@@ -14,6 +14,8 @@ public:
   int y;
   point operator + (point &a);
   point& operator += (point a);
+  point operator - (point& a);
+  point& operator -= (point a);
 };
 using size = point;
 

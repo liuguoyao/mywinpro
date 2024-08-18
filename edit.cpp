@@ -1,4 +1,5 @@
 #include "edit.h"
+#include "app.h"
 
 edit::edit(std::wstring name, control_base* parent)
   :control_base(name, parent), _time_acc(0), _draw_text_cursor(true)
@@ -11,20 +12,17 @@ void edit::onPaint(HDC hdc)
   control_base::onPaint(hdc);
 
   std::wstring text = _context+_comtext;
-  SIZE text_size = { 0, 0 };
-  GetTextExtentPoint32(hdc, text.c_str(), (int)text.length(), &text_size);
 
   point p1 = position_in_app();
-
   RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
   DrawText(hdc, text.c_str(), -1, &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER );
 
   //  draw 文本光标
   if(_draw_text_cursor && hasFocus())
   {
-    int cursor_margin = 4;
-    MoveToEx(hdc, p1.x+ cursor_margin+ text_size.cx, p1.y+ cursor_margin, NULL);
-    LineTo(hdc, p1.x+ cursor_margin + text_size.cx, p1.y+height- cursor_margin);
+    int cursor_margin = 0;
+    MoveToEx(hdc, p1.x+ cursor_margin+ _pos_text_cursor, p1.y+ cursor_margin, NULL);
+    LineTo(hdc, p1.x+ cursor_margin + _pos_text_cursor, p1.y+height- cursor_margin);
   }
 
 }
@@ -44,8 +42,9 @@ void edit::onupdateAnimState(long long delta_time)
 void edit::processLButtonDown(evt e)
 {
   control_base::processLButtonDown(e);
-  point pinc = position_in_app();
-  point p = point(e.x,e.y);
+  point pinc = point(e.x, e.y);
+  pinc -= position_in_app();
+  pinc.x -= 4;
 }
 
 void edit::processLButtonUp(evt e)
@@ -81,6 +80,7 @@ void edit::setFocus(bool focus)
 void edit::set_text(const std::wstring& text)
 {
   _context = text;
+  _pos_text_cursor = text_width(APP.hWnd, _context + _comtext);
 }
 
 std::wstring edit::get_text() const
