@@ -14,8 +14,8 @@ void edit::onPaint(HDC hdc)
   SIZE text_size = { 0, 0 };
   GetTextExtentPoint32(hdc, text.c_str(), (int)text.length(), &text_size);
 
-  point p1(x_relative_parent, y_relative_parent);
-  p1 += position_in_app();
+  point p1 = position_in_app();
+
   RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
   DrawText(hdc, text.c_str(), -1, &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER );
 
@@ -41,29 +41,31 @@ void edit::onupdateAnimState(long long delta_time)
   
 }
 
-void edit::processLButtonDown()
+void edit::processLButtonDown(evt e)
 {
-  control_base::processLButtonDown();
+  control_base::processLButtonDown(e);
+  point pinc = position_in_app();
+  point p = point(e.x,e.y);
 }
 
-void edit::processLButtonUp()
+void edit::processLButtonUp(evt e)
 {
-  control_base::processLButtonUp();
+  control_base::processLButtonUp(e);
 }
 
-void edit::processLButtonDBLClick()
+void edit::processLButtonDBLClick(evt e)
 {
-  control_base::processLButtonDBLClick();
+  control_base::processLButtonDBLClick(e);
 }
 
-void edit::processMouseEnter()
+void edit::processMouseEnter(evt e)
 {
-  control_base::processMouseEnter();
+  control_base::processMouseEnter(e);
 }
 
-void edit::processMouseLeave()
+void edit::processMouseLeave(evt e)
 {
-  control_base::processMouseLeave();
+  control_base::processMouseLeave(e);
 }
 
 void edit::setFocus(bool focus)

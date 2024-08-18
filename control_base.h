@@ -32,24 +32,24 @@ public:
   // event process
   virtual bool processEvent(evt e);
   virtual void processMouseMove(const point &p);
-  virtual void processMouseEnter();
-  virtual void processMouseLeave();
-  virtual void processLButtonDown();
-  virtual void processLButtonUp();
-  virtual void processLButtonDBLClick();
+  virtual void processMouseEnter(evt e);
+  virtual void processMouseLeave(evt e);
+  virtual void processLButtonDown(evt e);
+  virtual void processLButtonUp(evt e);
+  virtual void processLButtonDBLClick(evt e);
 
   virtual void updateState(long long delt_time);
   virtual void setBkColor(const rgb &rgb );
 
   //mouse event
   std::function<void(const point &)> onMouseMove;
-  std::function<void()> onEnter;
-  std::function<void()> onLeave;
-  std::function<void()> onClick;
-  std::function<void()> onDoubleClick;
-  std::function<void()> onLButtonDown;
-  std::function<void()> onLButtonUp;
-  std::function<void()> onLButtonDBLClick;
+  std::function<void(evt)> onEnter;
+  std::function<void(evt)> onLeave;
+  std::function<void(evt)> onClick;
+  std::function<void(evt)> onDoubleClick;
+  std::function<void(evt)> onLButtonDown;
+  std::function<void(evt)> onLButtonUp;
+  std::function<void(evt)> onLButtonDBLClick;
 
   //draw
   virtual void onPaint(HDC hdc);

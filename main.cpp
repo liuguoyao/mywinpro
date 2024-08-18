@@ -65,7 +65,7 @@ int main(int argc,char ** argv) {
   // -----------------------------------------
 
   //-------- process
-  btn1->onLButtonDown = [&]() {
+  btn1->onLButtonDown = [&](evt e) {
     OPENFILENAME ofn;
     wchar_t szFile[260];
 
@@ -89,7 +89,7 @@ int main(int argc,char ** argv) {
     }
     };
 
-  btn_endp->onLButtonDown = [&]() {
+  btn_endp->onLButtonDown = [&](evt e) {
     OutputDebugString((L"endprocess: " + edit->get_text()).c_str());
     KillProcess(edit->get_text());
     };

@@ -9,11 +9,11 @@ public:
 
   virtual void onPaint(HDC hdc) override;
   virtual void onupdateAnimState(long long delta_time) override;
-  virtual void processLButtonDown() override;
-  virtual void processLButtonUp() override;
-  virtual void processLButtonDBLClick() override;
-  virtual void processMouseEnter() override;
-  virtual void processMouseLeave() override;
+  virtual void processLButtonDown(evt e) override;
+  virtual void processLButtonUp(evt e) override;
+  virtual void processLButtonDBLClick(evt e) override;
+  virtual void processMouseEnter(evt e) override;
+  virtual void processMouseLeave(evt e) override;
   virtual void setFocus(bool focus) override;
 
 

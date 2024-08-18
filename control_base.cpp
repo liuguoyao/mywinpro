@@ -16,13 +16,13 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   parent(parent),
   hover(false),
   onMouseMove([](const point &) {}),
-  onClick([]() {}),
-  onDoubleClick([]() {}),
-  onEnter([]() {}),
-  onLeave([]() {}),
-  onLButtonDown([]() {}),
-  onLButtonUp([]() {}),
-  onLButtonDBLClick([]() {}),
+  onClick([](evt) {}),
+  onDoubleClick([](evt) {}),
+  onEnter([](evt) {}),
+  onLeave([](evt) {}),
+  onLButtonDown([](evt) {}),
+  onLButtonUp([](evt) {}),
+  onLButtonDBLClick([](evt) {}),
   name(name),
   id(0),
   needupdate(true),
@@ -107,9 +107,9 @@ point control_base::position()
 point control_base::position_in_app()
 {
   control_base* cur_p = parent;
-  point curp = {0,0};
+  point curp = position();
   while (nullptr!=cur_p)
-  {
+  { 
     curp += cur_p->position();
     cur_p = cur_p->parent;
   }
@@ -131,8 +131,8 @@ control_base* control_base::addChild(control_base* control)
 
 bool control_base::containsPoint(const point& p)
 {
-  point p1(x_relative_parent, y_relative_parent);
-  point p2(width + x_relative_parent, height + y_relative_parent);
+  point p1(0, 0);
+  point p2(width , height );
   point relativep = position_in_app();
   p1 += relativep;
   p2 += relativep;
@@ -186,17 +186,17 @@ bool control_base::processEvent(evt e)
     break;
   case WM_LBUTTONDOWN:
     mouseLeftButtonDown=true;
-    processLButtonDown();
+    processLButtonDown(e);
     break;
   case WM_LBUTTONUP:
     if (mouseLeftButtonDown)
     {
       mouseLeftButtonDown = false;
-      processLButtonUp();
+      processLButtonUp(e);
     }
     break;
   case WM_LBUTTONDBLCLK:
-    processLButtonDBLClick();
+    processLButtonDBLClick(e);
     break;
   default:
     break;
@@ -212,7 +212,7 @@ void control_base::processMouseMove(const point& global_p)
     if (!hover)
     {
       hover = true;
-      processMouseEnter();
+      processMouseEnter(evt(global_p.x, global_p.y,0,0) );
     }
   }
   else
@@ -221,7 +221,7 @@ void control_base::processMouseMove(const point& global_p)
     {
       if (!mouseLeftButtonDown) {
         hover = false;
-        processMouseLeave();
+        processMouseLeave(evt(global_p.x, global_p.y, 0, 0));
       }
         
     }
@@ -233,31 +233,31 @@ void control_base::processMouseMove(const point& global_p)
   needupdate = true;
 }
 
-void control_base::processMouseEnter()
+void control_base::processMouseEnter(evt e)
 {
-  onEnter();
+  onEnter(e);
 }
 
-void control_base::processMouseLeave()
+void control_base::processMouseLeave(evt e)
 {
-  onLeave();
+  onLeave(e);
 }
 
-void control_base::processLButtonDown()
+void control_base::processLButtonDown(evt e)
 {
   setFocus(true);
   PostMessage(APP.hWnd, WM_MY_SETFOCUS, (WPARAM)this, 0);
-  onLButtonDown();
+  onLButtonDown(e);
 }
 
-void control_base::processLButtonUp()
+void control_base::processLButtonUp(evt e)
 {
-  onLButtonUp();
+  onLButtonUp(e);
 }
 
-void control_base::processLButtonDBLClick()
+void control_base::processLButtonDBLClick(evt e)
 {
-  onLButtonDBLClick();
+  onLButtonDBLClick(e);
 }
 
 void control_base::updateState(long long delt_time)
@@ -280,8 +280,8 @@ void control_base::setBkColor(const rgb& bkcolor)
 
 void control_base::onPaint(HDC hdc)
 {
-  point p1(x_relative_parent, y_relative_parent);
-  point p2(width + x_relative_parent, height + y_relative_parent);
+  point p1(0, 0);
+  point p2(width , height );
   point relativep = position_in_app();
   p1 += relativep;
   p2 += relativep;
@@ -454,8 +454,8 @@ void control_base::invalidate()
 
 RECT control_base::rect_global()
 {
-  point p1(x_relative_parent, y_relative_parent);
-  p1 += position_in_app();
+  point p1 = position_in_app();
+
   RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
   return rect;
 }
