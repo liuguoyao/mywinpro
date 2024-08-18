@@ -75,3 +75,13 @@ void edit::setFocus(bool focus)
     _time_acc = 0;
   }
 }
+
+void edit::set_text(const std::wstring& text)
+{
+  _context = text;
+}
+
+std::wstring edit::get_text() const
+{
+  return _context;
+}

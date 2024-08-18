@@ -5,17 +5,55 @@
 #include "label.h"
 #include "Ctrls.h"
 #include <commdlg.h>  
+#include "edit.h"
+#include <tlhelp32.h>  
+
+bool KillProcess(const std::wstring& processName) {
+  HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (hSnapshot == INVALID_HANDLE_VALUE) {
+    return false;
+  }
+
+  PROCESSENTRY32 pe32;
+  pe32.dwSize = sizeof(PROCESSENTRY32);
+
+  if (!Process32First(hSnapshot, &pe32)) {
+    CloseHandle(hSnapshot);
+    return false;
+  }
+
+  do {
+    if (wcscmp(pe32.szExeFile, processName.c_str()) == 0) {
+      HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+      if (hProcess != NULL) {
+        if (!TerminateProcess(hProcess, 0)) {
+        }
+        CloseHandle(hProcess);
+        CloseHandle(hSnapshot);
+        return true;
+      }
+      else {
+      }
+    }
+  } while (Process32Next(hSnapshot, &pe32));
+
+  CloseHandle(hSnapshot);
+  return false;
+}
 
 int main(int argc,char ** argv) {
   app& a = app::getInstance();
 
   // -------------------- vlayout ----------------
   auto vl = Ctrls::instance().create_vlayout(L"vlayout", nullptr);
+  auto btn_fresh = Ctrls::instance().create_button(L"刷新", vl);
+  btn_fresh->setxPolicy(SIZEPOLICY_EXPAND);
   auto hl = Ctrls::instance().create_hlayout(L"hlayout", vl);
   hl->setyPolicy(SIZEPOLICY_FIXED);
   auto btn1 = Ctrls::instance().create_button(L"button", hl);
-  auto g = Ctrls::instance().create_edit(L"edit", hl);
-  //auto h = Ctrls::instance().create_button(L"button12", hl);
+  auto edit = Ctrls::instance().create_edit(L"edit", hl);
+  edit->set_text(L"notepad++.exe");
+  auto btn_endp = Ctrls::instance().create_button(L"终进", hl);
   //auto hl2 = Ctrls::instance().create_hlayout(L"hlayout2", vl);
   //hl2->setyPolicy(SIZEPOLICY_FIXED);
   //auto f2 = Ctrls::instance().create_button(L"button2", hl2);
@@ -46,9 +84,14 @@ int main(int argc,char ** argv) {
     // 显示打开文件对话框  
     if (GetOpenFileName(&ofn) == TRUE)
     {
-      // 用户选择了一个文件  
-      MessageBox(APP.hWnd, szFile, L"Selected File", MB_OK | MB_ICONINFORMATION);
+      
+      edit->set_text(std::wstring(szFile));
     }
+    };
+
+  btn_endp->onLButtonDown = [&]() {
+    OutputDebugString((L"endprocess: " + edit->get_text()).c_str());
+    KillProcess(edit->get_text());
     };
   //-----------------
 
