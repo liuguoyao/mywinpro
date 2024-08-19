@@ -17,10 +17,12 @@ void edit::onPaint(HDC hdc)
   point p1 = position_in_app();
 
   // 选中背景
-  RECT rect_selected = { p1.x+ _text_selectd_start_pos, p1.y+4, p1.x + _text_selectd_end_pos, p1.y + height-4 };
-  HBRUSH hbr = CreateSolidBrush(RGB(textSelectedBgColor.r, textSelectedBgColor.g, textSelectedBgColor.b)); // 白色背景  
-  FillRect(hdc, &rect_selected, hbr);
-  DeleteObject(hbr);
+  if (abs(_text_selectd_start_pos - _text_selectd_end_pos) > 1){
+    RECT rect_selected = { p1.x + _text_selectd_start_pos, p1.y + 4, p1.x + _text_selectd_end_pos, p1.y + height - 4 };
+    HBRUSH hbr = CreateSolidBrush(RGB(textSelectedBgColor.r, textSelectedBgColor.g, textSelectedBgColor.b)); // 白色背景  
+    FillRect(hdc, &rect_selected, hbr);
+    DeleteObject(hbr);
+  }
 
   RECT rect = { p1.x, p1.y, p1.x + width, p1.y + height };
   DrawText(hdc, text.c_str(), -1, &rect, DT_SINGLELINE | DT_LEFT | DT_VCENTER );
@@ -53,15 +55,22 @@ void edit::processLButtonDown(evt e)
 
   _time_acc = 0;
   _draw_text_cursor = true;
-  point pinc = point(e.x, e.y);
-  pinc -= position_in_app();
-  float w = text_width(APP.hWnd, _context);
-  float char_w = w/_context.length();
-  int prefer_pos_text_cursor = char_w * round(pinc.x/ char_w);
-  _pos_text_cursor =  prefer_pos_text_cursor>w?w: prefer_pos_text_cursor;
-  _text_selectd_start_pos = _pos_text_cursor;
-  _text_selectd_end_pos = _pos_text_cursor;
-
+  if (_context.length() > 0)
+  {
+    point pinc = point(e.x, e.y);
+    pinc -= position_in_app();
+    float w = text_width(APP.hWnd, _context);
+    float char_w = w / _context.length();
+    int prefer_pos_text_cursor = char_w * round(pinc.x / char_w);
+    _pos_text_cursor = prefer_pos_text_cursor > w ? w : prefer_pos_text_cursor;
+    _text_selectd_start_pos = _pos_text_cursor;
+    _text_selectd_end_pos = _pos_text_cursor;
+  }
+  else
+  {
+    _text_selectd_start_pos = _pos_text_cursor = _text_selectd_end_pos = 0;
+  }
+  
 }
 
 void edit::processLButtonUp(evt e)
@@ -123,8 +132,21 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
     {  //imm
     case WM_CHAR:
       if (wParam == VK_BACK) {
-        if (_context.length() > 0) _context.erase(_context.length() - 1);
-        _pos_text_cursor = text_width(hWnd, _context + _comtext);
+        if (_context.length() > 0) {
+          float w = text_width(APP.hWnd, _context);
+          float char_w = w / _context.length();
+          if (abs(_text_selectd_start_pos - _text_selectd_end_pos) < 1) {
+            _context.erase(round(_pos_text_cursor / char_w)-1,1);
+            _pos_text_cursor = _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor - char_w;
+          }
+          else {
+            int begin = min(_text_selectd_start_pos , _text_selectd_end_pos)/ char_w;
+            int end = max(_text_selectd_start_pos , _text_selectd_end_pos)/ char_w;
+            _context.erase(begin, end - begin);
+            _pos_text_cursor = _text_selectd_start_pos = _text_selectd_end_pos = round(begin* char_w);
+            OutputDebugString((L"_pos_text_cursor:"+std::to_wstring(_text_selectd_start_pos)+L"\n").c_str());
+          }
+        }
         break;
       }
       else if (wParam == VK_ESCAPE) {
@@ -173,6 +195,7 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
         _context += szCompStr;
       }
       _pos_text_cursor = text_width(hWnd, _context + _comtext);
+      _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
 
       // 更新文本框显示，处理dwSize字节的输入字符串
       OutputDebugString(szCompStr);
