@@ -238,6 +238,35 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
           }
         }
       }
+      if (wParam == VK_LEFT)
+      {
+        _time_acc = 0;
+        _draw_text_cursor = true;
+        _pos_text_cursor -= text_width(APP.hWnd, L"A");
+        _pos_text_cursor = _pos_text_cursor<0 ? 0 : _pos_text_cursor;
+        if (GetAsyncKeyState(VK_SHIFT))
+        {
+          _text_selectd_end_pos = _pos_text_cursor;
+        }
+        else {
+          _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
+        }
+      }
+      if (wParam == VK_RIGHT)
+      {
+        _time_acc = 0;
+        _draw_text_cursor = true;
+        float txt_w = text_width(APP.hWnd, L"A");
+        _pos_text_cursor += txt_w;
+        _pos_text_cursor = _pos_text_cursor > _context.length()* txt_w ? _context.length() * txt_w : _pos_text_cursor;
+        if (GetAsyncKeyState(VK_SHIFT))
+        {
+          _text_selectd_end_pos = _pos_text_cursor;
+        }
+        else {
+          _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
+        }
+      }
       break;
       //imm
     case WM_CHAR:
