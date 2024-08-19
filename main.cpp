@@ -7,6 +7,9 @@
 #include <commdlg.h>  
 #include "edit.h"
 #include <tlhelp32.h>  
+#include <windows.h>
+#include <psapi.h>  
+#pragma comment(lib, "psapi.lib")  
 
 bool KillProcess(const std::wstring& processName) {
   HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -41,6 +44,45 @@ bool KillProcess(const std::wstring& processName) {
   return false;
 }
 
+bool get_processname(std::wstring name) {
+    DWORD aProcesses[1024], cbNeeded, cProcesses;
+    unsigned int i;
+
+    if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
+      return false;
+
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    for (i = 0; i < cProcesses; i++) {
+      if (aProcesses[i] != 0) {
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, aProcesses[i]);
+
+        if (hProcess != NULL) {
+          HMODULE hMod;
+          DWORD cbNeeded;
+
+          if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
+            TCHAR szProcessName[MAX_PATH];
+
+            // 获取模块（通常是主执行文件）的完整路径  
+            if (GetModuleBaseName(hProcess, hMod, szProcessName, sizeof(szProcessName) / sizeof(TCHAR))) {
+              // 转换为小写进行比较（可选，取决于你的需求）  
+              for (int j = 0; szProcessName[j]; j++) {
+                szProcessName[j] = tolower(szProcessName[j]);
+              }
+              if (_tcscmp(szProcessName, name.c_str()) == 0) {
+                CloseHandle(hProcess);
+                return true;
+              }
+            }
+          }
+          CloseHandle(hProcess);
+        }
+      }
+    }
+    return false;
+  }
+
 int main(int argc,char ** argv) {
   app& a = app::getInstance();
 
@@ -65,6 +107,17 @@ int main(int argc,char ** argv) {
   // -----------------------------------------
 
   //-------- process
+  btn_fresh->onLButtonDown = [&](evt e) {
+    if (get_processname(L"notepad++.exe"))
+    {
+      btn1->setBkColor(textSelectedBgColor);
+    }
+    else
+    {
+      btn1->setBkColor(alertColor);
+    }
+    };
+
   btn1->onLButtonDown = [&](evt e) {
     OPENFILENAME ofn;
     wchar_t szFile[260];

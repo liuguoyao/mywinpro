@@ -20,6 +20,8 @@ extern rgb backgroundColor;
 extern rgb fontColor;
 extern rgb focusBorderColor;
 extern rgb textSelectedBgColor;
+extern rgb alertColor;
+extern rgb dangerColor;
 
 //sizepolicy
 #define SIZEPOLICY_FIXED 0
