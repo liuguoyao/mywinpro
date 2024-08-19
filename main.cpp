@@ -107,7 +107,8 @@ int main(int argc,char ** argv) {
   // -----------------------------------------
 
   //-------- process
-  btn_fresh->onLButtonDown = [&](evt e) {
+  timer t(1000, CYCLE, [&]() {
+    OutputDebugString(L"time out\n");
     if (get_processname(L"notepad++.exe"))
     {
       btn1->setBkColor(textSelectedBgColor);
@@ -116,6 +117,12 @@ int main(int argc,char ** argv) {
     {
       btn1->setBkColor(alertColor);
     }
+    });
+  btn_fresh->onLButtonDown = [&](evt e) {
+    if(t.is_running())
+      t.stop();
+    else
+      t.start();
     };
 
   btn1->onLButtonDown = [&](evt e) {

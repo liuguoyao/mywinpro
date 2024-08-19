@@ -3,9 +3,11 @@
 
 #include "framework.h"
 #include "control_base.h"
+#include "timer.h"
 #include <vector>
 #include <string>
 #include <set>
+#include <list>
 #include "Ctrls.h"
 #define APP app::getInstance()
 
@@ -27,6 +29,10 @@ class app
      size getSize() const;
      static void onSizeChanged(size newSize);
 
+     //timer
+     void remove_timer(timer *t);
+     void add_timer(timer *t);
+
 private:
   app();
   static LRESULT CALLBACK  WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -39,6 +45,7 @@ private:
   UINT_PTR uTimerId;
   static long long last_update_time;
   static std::set<control_base*> childrens;
+  static std::list<timer*> timers;
 };
 
 #endif // !

@@ -11,6 +11,7 @@
 #include <imm.h>
 
 std::set<control_base*> app::childrens{};
+std::list<timer*> timers{};
 long long app::last_update_time = 0;
 app::app()
 {
@@ -213,6 +214,12 @@ LRESULT app::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
       c->updateState(delta_time);
     }
+
+    //timer
+    for (const auto& c : ::timers)
+    {
+      c->update_expire_ticks(delta_time);
+    }
   }
   break;
 
@@ -326,4 +333,14 @@ void app::onSizeChanged(size newSize)
       }
     }
   }
+}
+
+void app::remove_timer(timer *t)
+{
+  ::timers.remove(t);
+}
+
+void app::add_timer(timer* t)
+{
+  ::timers.push_back(t);
 }

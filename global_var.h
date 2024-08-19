@@ -27,6 +27,10 @@ extern rgb dangerColor;
 #define SIZEPOLICY_FIXED 0
 #define SIZEPOLICY_EXPAND 1
 
+//time
+#define ONCE 0
+#define CYCLE 1
+
 
 //custom vm
 #define WM_MY_SETFOCUS (WM_USER + 1)
