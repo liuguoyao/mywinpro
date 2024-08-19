@@ -18,6 +18,7 @@ public:
   virtual void setFocus(bool focus) override;
 
   virtual void processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
+  virtual bool processEvent(evt e) override;
 
   void set_text(const std::wstring& text);
   std::wstring get_text() const;

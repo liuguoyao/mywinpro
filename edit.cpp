@@ -2,6 +2,48 @@
 #include "app.h"
 #include <cwctype>
 
+std::wstring get_clipboard_text()
+{
+  std::wstring clipboardText;
+
+  if (OpenClipboard(NULL))
+  {
+    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+    if (hData)
+    {
+      const wchar_t* pszText = (const wchar_t*)GlobalLock(hData);
+      if (pszText)
+      {
+        clipboardText = pszText;
+        GlobalUnlock(hData);
+      }
+    }
+    CloseClipboard();
+  }
+  return clipboardText;
+}
+int copy_to_clipboard(std::wstring text)
+{
+  if (!OpenClipboard(NULL))
+  {
+    return 1;
+  }
+  EmptyClipboard();
+
+  HANDLE hMem = GlobalAlloc(GMEM_MOVEABLE, (text.length()+1)*2);
+  if (hMem == NULL)
+  {
+    CloseClipboard();
+    return 1;
+  }
+  LPTSTR lpMem = (LPTSTR)GlobalLock(hMem);
+  lstrcpy(lpMem, text.c_str());
+  GlobalUnlock(hMem);
+  SetClipboardData(CF_UNICODETEXT, hMem);
+  CloseClipboard();
+  return 0;
+}
+
 edit::edit(std::wstring name, control_base* parent)
   :control_base(name, parent), _time_acc(0), _draw_text_cursor(true),
   _pos_text_cursor(0.0),_text_selectd_start_pos(0.0), _text_selectd_end_pos(0.0)
@@ -101,14 +143,21 @@ void edit::processMouseMove(const point& p)
   {
     _time_acc = 0;
     _draw_text_cursor = true;
-    point pinc = p;
-    pinc -= position_in_app();
-    float w = text_width(APP.hWnd, _context);
-    float char_w = w / _context.length();
-    int prefer_pos_text_cursor = char_w * round(pinc.x / char_w);
-    _pos_text_cursor = prefer_pos_text_cursor > w ? w : prefer_pos_text_cursor;
-    _pos_text_cursor = _pos_text_cursor < 0 ? 0 : _pos_text_cursor;
-    _text_selectd_end_pos = _pos_text_cursor;
+    if (_context.length() > 0)
+    {
+      point pinc = p;
+      pinc -= position_in_app();
+      float w = text_width(APP.hWnd, _context);
+      float char_w = w / _context.length();
+      int prefer_pos_text_cursor = char_w * round(pinc.x / char_w);
+      _pos_text_cursor = prefer_pos_text_cursor > w ? w : prefer_pos_text_cursor;
+      _pos_text_cursor = _pos_text_cursor < 0 ? 0 : _pos_text_cursor;
+      _text_selectd_end_pos = _pos_text_cursor;
+    }
+    else
+    {
+      _text_selectd_start_pos = _pos_text_cursor = _text_selectd_end_pos = 0;
+    }
   }
 }
 
@@ -129,7 +178,64 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
   if (hasFocus())
   {
     switch (message)
-    {  //imm
+    {  
+    case WM_KEYDOWN:
+      if (GetAsyncKeyState(VK_CONTROL))
+      {
+        if (wParam == 'C') { // 检查是否为 CTRL+C
+          if (_context.length() > 0)
+          {
+            float w = text_width(APP.hWnd, _context);
+            float char_w = w / _context.length();
+            int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+            int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+            copy_to_clipboard(_context.substr(begin, len));
+          }
+        }
+        else if (wParam == 'V') { // 检查是否为 CTRL+V
+          std::wstring clipboardText = get_clipboard_text();
+          if (abs(_text_selectd_end_pos - _text_selectd_start_pos) > 1)
+          {
+            if (_context.length() > 0)
+            {
+              float w = text_width(APP.hWnd, _context);
+              float char_w = w / _context.length();
+              int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+              int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+              _context.replace(begin, len, clipboardText);
+            }
+          }
+          else
+          {
+            if (_context.length() > 0) {
+              float w = text_width(APP.hWnd, _context);
+              float char_w = w / _context.length();
+              _context.insert(round(_pos_text_cursor / char_w), clipboardText);
+            }
+            else
+            {
+              _context = clipboardText;
+            }
+          }
+        }
+        else if (wParam == 'X') { // 检查是否为 CTRL+X
+          if (_context.length() > 0)
+          {
+            float w = text_width(APP.hWnd, _context);
+            float char_w = w / _context.length();
+            int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+            int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+            copy_to_clipboard(_context.substr(begin,len));
+            if (_context.length()>0)
+            {
+              _context.erase(begin, len);
+              _pos_text_cursor = _text_selectd_start_pos = _text_selectd_end_pos = round(begin* char_w);
+            }
+          }
+        }
+      }
+      break;
+      //imm
     case WM_CHAR:
       if (wParam == VK_BACK) {
         if (_context.length() > 0) {
@@ -211,6 +317,12 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
       break;
     }
   }
+}
+
+bool edit::processEvent(evt e)
+{
+  control_base::processEvent(e);
+  return false;
 }
 
 void edit::set_text(const std::wstring& text)
