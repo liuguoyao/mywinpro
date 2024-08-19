@@ -92,10 +92,10 @@ int main(int argc,char ** argv) {
   btn_fresh->setxPolicy(SIZEPOLICY_EXPAND);
   auto hl = Ctrls::instance().create_hlayout(L"hlayout", vl);
   hl->setyPolicy(SIZEPOLICY_FIXED);
-  auto btn1 = Ctrls::instance().create_button(L"button", hl);
+  auto btn1 = Ctrls::instance().create_button(L"´´", hl);
   auto edit = Ctrls::instance().create_edit(L"edit", hl);
   edit->set_text(L"notepad++.exe");
-  auto btn_endp = Ctrls::instance().create_button(L"ÖÕ½ø", hl);
+  auto btn_endp = Ctrls::instance().create_button(L"±Ð", hl);
   //auto hl2 = Ctrls::instance().create_hlayout(L"hlayout2", vl);
   //hl2->setyPolicy(SIZEPOLICY_FIXED);
   //auto f2 = Ctrls::instance().create_button(L"button2", hl2);
@@ -123,6 +123,7 @@ int main(int argc,char ** argv) {
       t.stop();
     else
       t.start();
+    btn_fresh->set_text(t.is_running() ? L"Í£Ö¹" : L"Ë¢ÐÂ");
     };
 
   btn1->onLButtonDown = [&](evt e) {

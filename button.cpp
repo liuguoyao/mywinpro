@@ -7,7 +7,7 @@ button::button()
 }
 
 button::button(std::wstring name, control_base* parent)
-  : control_base(name, parent)
+  : control_base(name, parent),_text(name)
 {
   //this->onEnter = [&]() {
   //    setBkColor(::hoverColor);
@@ -35,7 +35,7 @@ void button::onPaint(HDC hdc)
   //SetBkColor(hdc,  RGB(0, 0, 255));
   SetBkMode(hdc, TRANSPARENT);
 
-  DrawText(hdc, name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOCLIP);
+  DrawText(hdc, _text.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOCLIP);
 }
 
 void button::processMouseEnter(evt e)
@@ -47,6 +47,14 @@ void button::processMouseLeave(evt e)
 {
   control_base::processMouseLeave(e);
   setBkColor(::backgroundColor);
+}
+std::wstring button::get_text()
+{
+  return _text;
+}
+void button::set_text(std::wstring text)
+{
+  _text = text;
 }
 void button::onupdateAnimState(long long delta_time)
 {

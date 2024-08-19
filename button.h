@@ -15,9 +15,11 @@ public:
   virtual void processLButtonDBLClick(evt e) override;
   virtual void processMouseEnter(evt e);
   virtual void processMouseLeave(evt e);
+  std::wstring get_text();
+  void set_text(std::wstring text);
 
 private:
-
+  std::wstring _text;
 };
 
 
