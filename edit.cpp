@@ -203,6 +203,8 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
               int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
               int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
               _context.replace(begin, len, clipboardText);
+              _pos_text_cursor = (begin + clipboardText.length())* char_w;
+              _text_selectd_end_pos = _pos_text_cursor;
             }
           }
           else
@@ -211,6 +213,8 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
               float w = text_width(APP.hWnd, _context);
               float char_w = w / _context.length();
               _context.insert(round(_pos_text_cursor / char_w), clipboardText);
+              _pos_text_cursor += (clipboardText.length()) * char_w;
+              _text_selectd_end_pos = _pos_text_cursor;
             }
             else
             {
