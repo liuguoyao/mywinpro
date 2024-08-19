@@ -14,8 +14,10 @@ public:
   virtual void processLButtonDBLClick(evt e) override;
   virtual void processMouseEnter(evt e) override;
   virtual void processMouseLeave(evt e) override;
+  virtual void processMouseMove(const point& p) override;
   virtual void setFocus(bool focus) override;
 
+  virtual void processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
   void set_text(const std::wstring& text);
   std::wstring get_text() const;
@@ -24,7 +26,11 @@ public:
     //point text_cursor_pos;
    unsigned short _time_acc;
    bool _draw_text_cursor;
-
+   float _text_selectd_start_pos;
+   float _text_selectd_end_pos;
+   std::wstring _comtext;
+   std::wstring _context;
+   float _pos_text_cursor;
 
 };
 

@@ -19,6 +19,7 @@ extern rgb activeColor;
 extern rgb backgroundColor;
 extern rgb fontColor;
 extern rgb focusBorderColor;
+extern rgb textSelectedBgColor;
 
 //sizepolicy
 #define SIZEPOLICY_FIXED 0

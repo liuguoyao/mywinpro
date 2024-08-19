@@ -124,12 +124,9 @@ protected:
 
   //focus
   bool _hasFocus;
-  std::wstring _comtext;
-  std::wstring _context;
 
   //sizePolicy
   sizePolicy _sizePolicy;
-  float _pos_text_cursor;
 
 private:
   bool needupdate;

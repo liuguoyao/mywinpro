@@ -47,8 +47,7 @@ control_base::control_base(const std::wstring &name, control_base* parent) :
   mouseRightButtonUp(false),
   mouseLeftButtonClick(false),
   _hasFocus(false),
-  _sizePolicy{SIZEPOLICY_FIXED,SIZEPOLICY_FIXED,0,0},
-  _pos_text_cursor(0.0)
+  _sizePolicy{SIZEPOLICY_FIXED,SIZEPOLICY_FIXED,0,0}
 {
   if (nullptr != parent)
   {
@@ -210,8 +209,7 @@ bool control_base::processEvent(evt e)
   switch (e.type)
   {
   case WM_MOUSEMOVE:
-    if(!mouseLeftButtonDown)
-      processMouseMove(point(e.x,e.y));
+    processMouseMove(point(e.x,e.y));
     break;
   case WM_LBUTTONDOWN:
     mouseLeftButtonDown=true;
@@ -357,77 +355,6 @@ void control_base::onupdateAnimState(long long delt_time)
 
 void control_base::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  if (hasFocus())
-  {
-    switch (message)
-    {  //imm
-    case WM_CHAR:
-      if (wParam == VK_BACK) {
-        if(_context.length()>0) _context.erase(_context.length() - 1);
-        _pos_text_cursor = text_width(hWnd, _context + _comtext);
-        break;
-      }else if (wParam == VK_ESCAPE) {
-        _context.clear();
-        _pos_text_cursor = 1;
-        break;
-      }
-      else if(std::iswprint((unsigned short)wParam))
-      {
-        _context += (WCHAR)wParam;
-        _pos_text_cursor = text_width(hWnd, _context + _comtext);
-      }
-      else
-      {
-
-      }
-      break;
-    case WM_IME_STARTCOMPOSITION: {
-      if (!hasFocus()) break;
-      HIMC hIMC = ImmGetContext(hWnd);
-      if (hIMC) {
-        COMPOSITIONFORM cf;
-        cf.dwStyle = CFS_POINT; // 使用点定位
-        POINT pt = { position_in_app().x * 2, position_in_app().y + height };
-        cf.ptCurrentPos = pt;   // 设置候选框的位置
-        ImmSetCompositionWindow(hIMC, &cf);
-
-        ImmReleaseContext(hWnd, hIMC);
-      }
-    }
-      break;
-    case WM_IME_COMPOSITION: {
-      if (!hasFocus()) break;
-      WCHAR szCompStr[256];
-      HIMC hIMC = ImmGetContext(hWnd);
-      memset(szCompStr, 0, sizeof(szCompStr));
-      if (lParam & GCS_COMPSTR) {
-        DWORD dwSize = ImmGetCompositionStringW(hIMC, GCS_COMPSTR, szCompStr, 256);
-        _comtext = szCompStr;
-      }
-      else if (lParam & GCS_RESULTSTR)
-      {
-        LONG buflen = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
-        ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, szCompStr, buflen);
-        _comtext = L"";
-        _context += szCompStr;
-      }
-      _pos_text_cursor = text_width(hWnd, _context + _comtext);
-
-      // 更新文本框显示，处理dwSize字节的输入字符串
-      OutputDebugString(szCompStr);
-      ImmReleaseContext(hWnd, hIMC);
-      InvalidateRect(hWnd, NULL, false);
-      break;
-    }
-    case WM_IME_ENDCOMPOSITION:
-      break;
-
-    default:
-      //DefWindowProc(hWnd, message, wParam, lParam);
-      break;
-    }
-  }
-
   for (auto c:childrens)
   {
     c->processIMMEvent(hWnd,  message,  wParam,  lParam);
