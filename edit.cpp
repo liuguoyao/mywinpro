@@ -55,8 +55,19 @@ void edit::onPaint(HDC hdc)
 {
   control_base::onPaint(hdc);
 
-  std::wstring text = _context+_comtext;
   point p1 = position_in_app();
+
+  //std::wstring text = _context+_comtext;
+  std::wstring text = _context;
+  if (_comtext.length()>0)
+  {
+    float char_w = text_width(APP.hWnd, L"A");
+    int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+    int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+    text.replace(begin, 0, _comtext);
+    _pos_text_cursor = (begin + _comtext.length()) * char_w;
+    _text_selectd_end_pos = _pos_text_cursor;
+  }
 
   // 选中背景
   if (abs(_text_selectd_start_pos - _text_selectd_end_pos) > 1){
@@ -295,8 +306,14 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
       }
       else if (std::iswprint((unsigned short)wParam))
       {
-        _context += (WCHAR)wParam;
-        _pos_text_cursor = text_width(hWnd, _context + _comtext);
+        float char_w = text_width(APP.hWnd, L"A");
+        int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+        int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+        std::wstring in_text;
+        in_text = (WCHAR)wParam;
+        _context.replace(begin, len, in_text);
+        _pos_text_cursor = (begin + in_text.length()) * char_w;
+        _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
       }
       else
       {
@@ -331,13 +348,19 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
         LONG buflen = ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, NULL, 0);
         ImmGetCompositionStringW(hIMC, GCS_RESULTSTR, szCompStr, buflen);
         _comtext = L"";
-        _context += szCompStr;
+
+        std::wstring in_text = szCompStr;
+        float char_w = text_width(APP.hWnd, L"A");
+        int len = round(abs(_text_selectd_end_pos - _text_selectd_start_pos) / char_w);
+        int begin = round(min(_text_selectd_start_pos, _text_selectd_end_pos) / char_w);
+        _context.replace(begin, 0, in_text);
+        _pos_text_cursor = (begin + in_text.length()) * char_w;
+        _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
       }
-      _pos_text_cursor = text_width(hWnd, _context + _comtext);
-      _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
+      //_pos_text_cursor = text_width(hWnd, _context + _comtext);
+      //_text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
 
       // 更新文本框显示，处理dwSize字节的输入字符串
-      OutputDebugString(szCompStr);
       ImmReleaseContext(hWnd, hIMC);
       InvalidateRect(hWnd, NULL, false);
       break;
