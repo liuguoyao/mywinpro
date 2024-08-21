@@ -30,6 +30,7 @@ private:
   void textCusorShift(bool forward,bool select_flag=false);
   void setTextCusor(int cnt);
   void getTextCusor(int& cnt);
+  int text_width(const std::wstring &text);
   
 
  private:

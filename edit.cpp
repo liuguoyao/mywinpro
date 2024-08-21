@@ -48,7 +48,7 @@ int copy_to_clipboard(std::wstring text)
 edit::edit(std::wstring name, control_base* parent)
   :control_base(name, parent), _time_acc(0), _draw_text_cursor(true),
   _pos_text_cursor(0.0),_text_selectd_start_pos(0.0), _text_selectd_end_pos(0.0),
-  char_w(text_width(APP.hWnd,L"A"))
+  char_w(control_base::text_width(APP.hWnd, L"A"))
 {
   _sizePolicy.xPolicy = SIZEPOLICY_EXPAND;
 }
@@ -65,10 +65,8 @@ void edit::onPaint(HDC hdc)
     int left = 0, right = 0;
     getSelected(left, right);
     text.replace(left, 0, _comtext);
-
-    auto test_w = _context;
-    _pos_text_cursor = text_width(APP.hWnd, test_w.substr(0, left + _comtext.length()));
-    _text_selectd_end_pos = _pos_text_cursor;
+    _text_selectd_end_pos = text_width(_comtext) + text_width(text.substr(0, left));
+ 
   }
 
   // 选中背景
@@ -110,21 +108,22 @@ void edit::processLButtonDown(evt e)
 
   _time_acc = 0;
   _draw_text_cursor = true;
-  if (_context.length() > 0)
+
+  point pinc = point(e.x, e.y);
+  pinc -= position_in_app();
+  auto isAsii = checkAsciiInWString(_context);
+  setTextCusor(isAsii.size());
+  int len = 0;
+  for (int i=0;i<isAsii.size();i++)
   {
-    point pinc = point(e.x, e.y);
-    pinc -= position_in_app();
-    float w = text_width(APP.hWnd, _context);
-    int prefer_pos_text_cursor = char_w * round(pinc.x / char_w);
-    _pos_text_cursor = prefer_pos_text_cursor > w ? w : prefer_pos_text_cursor;
-    _text_selectd_start_pos = _pos_text_cursor;
-    _text_selectd_end_pos = _pos_text_cursor;
+    len += char_w;
+    if (!isAsii[i])
+      len += char_w;
+    if (pinc.x < len) {
+      setTextCusor(i);
+      break;
+    }
   }
-  else
-  {
-    _text_selectd_start_pos = _pos_text_cursor = _text_selectd_end_pos = 0;
-  }
-  
 }
 
 void edit::processLButtonUp(evt e)
@@ -155,20 +154,29 @@ void edit::processMouseMove(const point& p)
   {
     _time_acc = 0;
     _draw_text_cursor = true;
-    if (_context.length() > 0)
+
+    point pinc = p;
+    pinc -= position_in_app();
+
+    float w = text_width(_context);
+
+    if (abs(_text_selectd_end_pos - pinc.x)>=char_w)
     {
-      point pinc = p;
-      pinc -= position_in_app();
-      float w = text_width(APP.hWnd, _context);
-      int prefer_pos_text_cursor = char_w * round(pinc.x / char_w);
-      _pos_text_cursor = prefer_pos_text_cursor > w ? w : prefer_pos_text_cursor;
-      _pos_text_cursor = _pos_text_cursor < 0 ? 0 : _pos_text_cursor;
-      _text_selectd_end_pos = _pos_text_cursor;
+      auto isAsii = checkAsciiInWString(_context);
+
+      int len = 0;
+      for (int i = 0; i < isAsii.size(); i++)
+      {
+        len += char_w;
+        if (!isAsii[i])
+          len += char_w;
+        if (pinc.x < len) {
+          _text_selectd_end_pos = len;
+          break;
+        }
+      }
     }
-    else
-    {
-      _text_selectd_start_pos = _pos_text_cursor = _text_selectd_end_pos = 0;
-    }
+
   }
 }
 
@@ -261,12 +269,10 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
       {
         int left = 0, right = 0;
         getSelected(left, right);
-        std::wstring in_text;
+        std::wstring in_text ;
         in_text = (WCHAR)wParam;
         _context.replace(left, right-left, in_text);
-        auto test_w = _context;
-        _pos_text_cursor = text_width(APP.hWnd, test_w.substr(0, left + in_text.length()));
-        _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
+        textCusorShift(true);
       }
       else
       {
@@ -306,9 +312,7 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
         int left = 0, right = 0;
         getSelected(left, right);
         _context.replace(left, 0, in_text);
-        auto test_w = _context;
-        _pos_text_cursor = text_width(APP.hWnd, test_w.substr(0, left + in_text.length()));
-        _text_selectd_start_pos = _text_selectd_end_pos = _pos_text_cursor;
+        setTextCusor(left+in_text.length());
       }
 
       // 更新文本框显示，处理dwSize字节的输入字符串
@@ -335,7 +339,7 @@ bool edit::processEvent(evt e)
 void edit::set_text(const std::wstring& text)
 {
   _context = text;
-  _pos_text_cursor = text_width(APP.hWnd, _context + _comtext);
+  _pos_text_cursor = text_width(_context + _comtext);
 }
 
 std::wstring edit::get_text() const
@@ -493,4 +497,17 @@ void edit::getTextCusor(int &cnt)
       break;
     }
   }
+}
+
+int edit::text_width(const std::wstring& text)
+{
+  auto isAsii = checkAsciiInWString(text);
+  int len = 0;
+  for (auto c : isAsii)
+  {
+    len += char_w;
+    if (!c)
+      len += char_w;
+  }
+  return len;
 }
