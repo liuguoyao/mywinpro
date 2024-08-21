@@ -23,6 +23,15 @@ public:
   void set_text(const std::wstring& text);
   std::wstring get_text() const;
 
+private:
+  void setSelected(int left,int right);
+  void getSelected(int &left,int &right);
+  void clearSelected();
+  void textCusorShift(bool forward,bool select_flag=false);
+  void setTextCusor(int cnt);
+  void getTextCusor(int& cnt);
+  
+
  private:
     //point text_cursor_pos;
    unsigned short _time_acc;
@@ -32,6 +41,7 @@ public:
    std::wstring _comtext;
    std::wstring _context;
    float _pos_text_cursor;
+   float char_w;
 
 };
 

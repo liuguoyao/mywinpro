@@ -108,8 +108,7 @@ int main(int argc,char ** argv) {
 
   //-------- process
   timer t(1000, CYCLE, [&]() {
-    OutputDebugString(L"time out\n");
-    if (get_processname(L"notepad++.exe"))
+    if (get_processname(edit->get_text()))
     {
       btn1->setBkColor(textSelectedBgColor);
     }
