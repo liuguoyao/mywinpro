@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 
+bool get_processname(std::wstring name);
+bool KillProcess(const std::wstring& processName);
+
 bool isAsciiChar(const char& c);
 bool isAsciiWchar(const WCHAR& c);
 
