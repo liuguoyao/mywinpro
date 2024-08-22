@@ -65,13 +65,13 @@ void edit::onPaint(HDC hdc)
     int left = 0, right = 0;
     getSelected(left, right);
     text.replace(left, 0, _comtext);
-    _text_selectd_end_pos = text_width(_comtext) + text_width(text.substr(0, left));
+    _text_selectd_end_pos = (float)(text_width(_comtext) + text_width(text.substr(0, left)));
  
   }
 
   // 选中背景
   if (abs(_text_selectd_start_pos - _text_selectd_end_pos) > 1){
-    RECT rect_selected = { p1.x + _text_selectd_start_pos, p1.y + 4, p1.x + _text_selectd_end_pos, p1.y + height - 4 };
+    RECT rect_selected = { (long)(p1.x + _text_selectd_start_pos), (long)(p1.y + 4), (long)(p1.x + _text_selectd_end_pos), (long)(p1.y + height - 4) };
     HBRUSH hbr = CreateSolidBrush(RGB(textSelectedBgColor.r, textSelectedBgColor.g, textSelectedBgColor.b)); // 白色背景  
     FillRect(hdc, &rect_selected, hbr);
     DeleteObject(hbr);
@@ -84,8 +84,8 @@ void edit::onPaint(HDC hdc)
   if(_draw_text_cursor && hasFocus())
   {
     int cursor_margin = 0;
-    MoveToEx(hdc, p1.x+ cursor_margin+ _pos_text_cursor, p1.y+ cursor_margin, NULL);
-    LineTo(hdc, p1.x+ cursor_margin + _pos_text_cursor, p1.y+height- cursor_margin);
+    MoveToEx(hdc, p1.x+ cursor_margin+ (int)_pos_text_cursor, p1.y+ cursor_margin, NULL);
+    LineTo(hdc, p1.x+ cursor_margin + (int)_pos_text_cursor, p1.y+height- cursor_margin);
   }
 
 }
@@ -112,13 +112,13 @@ void edit::processLButtonDown(evt e)
   point pinc = point(e.x, e.y);
   pinc -= position_in_app();
   auto isAsii = checkAsciiInWString(_context);
-  setTextCusor(isAsii.size());
+  setTextCusor((int)isAsii.size());
   int len = 0;
   for (int i=0;i<isAsii.size();i++)
   {
-    len += char_w;
+    len += (int)char_w;
     if (!isAsii[i])
-      len += char_w;
+      len += (int)char_w;
     if (pinc.x < len) {
       setTextCusor(i);
       break;
@@ -158,7 +158,7 @@ void edit::processMouseMove(const point& p)
     point pinc = p;
     pinc -= position_in_app();
 
-    float w = text_width(_context);
+    float w = (float)text_width(_context);
     auto isAsii = checkAsciiInWString(_context);
     int len = 0;
 
@@ -166,16 +166,16 @@ void edit::processMouseMove(const point& p)
     {
       for (int i = 0; i < isAsii.size(); i++)
       {
-        int charact_w = char_w;
+        int charact_w = (int)char_w;
         if (!isAsii[i]) {
-          charact_w += char_w;
+          charact_w += (int)char_w;
         }
         if (pinc.x < len+char_w/2) {
           break;
         }
         len += charact_w;
       }
-      _text_selectd_end_pos = len;
+      _text_selectd_end_pos = (float)len;
     }
   }
 }
@@ -214,7 +214,7 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
           int left = 0, right = 0;
           getSelected(left, right);
           _context.replace(left, right - left, clipboardText);
-          setTextCusor(left + clipboardText.length());
+          setTextCusor(left + (int)clipboardText.length());
         }
         else if (wParam == 'X') { // 检查是否为 CTRL+X
           int left = 0, right = 0;
@@ -312,7 +312,7 @@ void edit::processIMMEvent(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
         int left = 0, right = 0;
         getSelected(left, right);
         _context.replace(left, 0, in_text);
-        setTextCusor(left+in_text.length());
+        setTextCusor(left+(int)in_text.length());
       }
 
       // 更新文本框显示，处理dwSize字节的输入字符串
@@ -339,7 +339,7 @@ bool edit::processEvent(evt e)
 void edit::set_text(const std::wstring& text)
 {
   _context = text;
-  _pos_text_cursor = text_width(_context + _comtext);
+  _pos_text_cursor = (float)text_width(_context + _comtext);
 }
 
 std::wstring edit::get_text() const
@@ -350,7 +350,7 @@ std::wstring edit::get_text() const
 void edit::setSelected(int left, int right)
 {
   left = left < 0 ? 0 : left;
-  right = right > _context.length() ? _context.length() : right;
+  right = right > (int)_context.length() ? (int)_context.length() : right;
   auto isAsii_v = checkAsciiInWString(_context);
 
   _text_selectd_start_pos = 0;
@@ -395,9 +395,9 @@ void edit::getSelected(int& left, int& right)
     for (short i = 0; i < _context.length(); i++)
     {
       if (isAsii_v[i])
-        len += char_w;
+        len += (int)char_w;
       else
-        len += char_w * 2;
+        len += (int)char_w * 2;
 
       if (len >= start) {
         left = i + 1;
@@ -413,9 +413,9 @@ void edit::getSelected(int& left, int& right)
     for (short i = left; i < _context.length(); i++)
     {
       if (isAsii_v[i])
-        len += char_w;
+        len += (int)char_w;
       else
-        len += char_w * 2;
+        len += (int)char_w * 2;
 
       if (len >= end) {
         right = i + 1;
@@ -445,7 +445,7 @@ void edit::textCusorShift(bool forward, bool select_flag)
     if (cnt <= 0 ) return;
   }
 
-  int step = forward ? char_w : -char_w;
+  int step = forward ? (int)char_w : -(int)char_w;
   cnt = forward ? cnt : cnt - 1;
 
   _pos_text_cursor += step;
@@ -462,17 +462,17 @@ void edit::setTextCusor(int cnt)
 {
   auto isAsii_v = checkAsciiInWString(_context);
   int len = 0;
-  if (cnt > _context.length()) cnt = _context.length();
+  if (cnt > _context.length()) cnt = (int)_context.length();
   if (cnt < 0) cnt = 0;
 
   for (short i = 0; i < cnt; i++)
   {
     if (isAsii_v[i])
-      len += char_w;
+      len += (int)char_w;
     else
-      len += char_w * 2;
+      len += (int)char_w * 2;
   }
-  _pos_text_cursor = _text_selectd_start_pos = _text_selectd_end_pos = len;
+  _pos_text_cursor = _text_selectd_start_pos = _text_selectd_end_pos = (float)len;
 }
 
 void edit::getTextCusor(int &cnt)
@@ -488,9 +488,9 @@ void edit::getTextCusor(int &cnt)
   for (short i = 0; i < _context.length(); i++)
   {
     if (isAsii_v[i])
-      len += char_w;
+      len += (int)char_w;
     else
-      len += char_w * 2;
+      len += (int)char_w * 2;
 
     if (len >= _pos_text_cursor) {
       cnt = i + 1;
@@ -505,9 +505,9 @@ int edit::text_width(const std::wstring& text)
   int len = 0;
   for (auto c : isAsii)
   {
-    len += char_w;
+    len += (int)char_w;
     if (!c)
-      len += char_w;
+      len += (int)char_w;
   }
   return len;
 }

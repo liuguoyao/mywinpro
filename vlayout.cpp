@@ -67,7 +67,7 @@ void vlayout::placeChildren()
       acc_height_factor += policy.yFactor;
     }
     if (SIZEPOLICY_EXPAND == policy.xPolicy) {
-      c->resize(getSize().x - 2 * margin, c->getSize().y);
+      c->resize(getSize().x - 2 * (int)margin, c->getSize().y);
     }
   }
   float height_expend_children = layout_height - acc_height_fixed - margin*(cnt_expend_children+1);

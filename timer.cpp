@@ -14,7 +14,7 @@ timer::timer(int expire_ticks,int runtype,std::function<void()> callback_fun)
 void timer::update_expire_ticks(uint64_t delta_ticks)
 {
   if (!is_running()) return;
-  expire_ticks-=delta_ticks;
+  expire_ticks-=(int)delta_ticks;
   if(expire_ticks<=0)
   {
       callback_fun();

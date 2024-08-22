@@ -67,7 +67,7 @@ void hlayout::placeChildren()
       acc_width_factor+= policy.xFactor;
     }
     if (SIZEPOLICY_EXPAND == policy.yPolicy) {
-      c->resize(c->getSize().x, getSize().y - 2 * margin);
+      c->resize(c->getSize().x, getSize().y - 2 * (int)margin);
     }
   }
   float width_expend_children = layout_width - acc_width_fixed - margin * (childrens.size()+1);
