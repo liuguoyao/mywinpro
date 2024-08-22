@@ -159,24 +159,24 @@ void edit::processMouseMove(const point& p)
     pinc -= position_in_app();
 
     float w = text_width(_context);
+    auto isAsii = checkAsciiInWString(_context);
+    int len = 0;
 
-    if (abs(_text_selectd_end_pos - pinc.x)>=char_w)
+    if (abs(_text_selectd_end_pos - pinc.x) > char_w/2)
     {
-      auto isAsii = checkAsciiInWString(_context);
-
-      int len = 0;
       for (int i = 0; i < isAsii.size(); i++)
       {
-        len += char_w;
-        if (!isAsii[i])
-          len += char_w;
-        if (pinc.x < len) {
-          _text_selectd_end_pos = len;
+        int charact_w = char_w;
+        if (!isAsii[i]) {
+          charact_w += char_w;
+        }
+        if (pinc.x < len+char_w/2) {
           break;
         }
+        len += charact_w;
       }
+      _text_selectd_end_pos = len;
     }
-
   }
 }
 
