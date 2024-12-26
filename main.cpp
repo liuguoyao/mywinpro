@@ -70,21 +70,25 @@ int main(int argc,char ** argv) {
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = APP.hWnd;
-    ofn.lpstrFile = szFile;
+    //ofn.lpstrFile = szFile;
+    ofn.lpstrFile = L'\0';
     ofn.nMaxFile = sizeof(szFile);
     ofn.lpstrFilter = L"All Files\0*.*\0Text Files\0*.TXT\0";
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = NULL;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+    //ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST ;
 
     // 显示打开文件对话框  
+    OutputDebugString(L"OpenFile: ");
     if (GetOpenFileName(&ofn) == TRUE)
     {
       
       edit->set_text(std::wstring(szFile));
     }
+    OutputDebugString(L"end OpenFile: ");
     };
 
   btn_endp->onLButtonDown = [&](evt e) {
